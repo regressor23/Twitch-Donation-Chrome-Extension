@@ -49,6 +49,12 @@ pub struct Claim<'info> {
     pub escrow_token: Account<'info, TokenAccount>,
 
     /// Replay guard: `init` fails if this nonce was already burnt.
+    ///
+    /// Do not turn this into `init_if_needed`. `init` is a System Program
+    /// guarantee — an account at these seeds either does not exist or the
+    /// transaction is dead before the handler runs. `init_if_needed` would move
+    /// that guarantee into one `require!` of ours, which a refactor can drop
+    /// without any test noticing. See docs/security.md.
     #[account(
         init,
         payer = claimer,

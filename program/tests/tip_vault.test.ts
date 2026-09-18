@@ -277,7 +277,18 @@ describe('claim', () => {
     expect(tipState.settled).toBe(true);
   });
 
-  it('refuses to replay the same attestation', async () => {
+  /**
+   * A real replay: same channel, recipient, nonce and expiry produce the same
+   * message, and ed25519 signing is deterministic, so the second transaction
+   * carries a byte-identical ed25519 instruction.
+   *
+   * It dies before any of our code runs. The nonce PDA is declared with `init`,
+   * so the System Program refuses to create an account that already exists —
+   * hence the assertion on `already in use` rather than on one of our error
+   * codes. That is the point: the guarantee does not depend on a line of ours
+   * that a later refactor could drop. See docs/security.md.
+   */
+  it('stops a byte-identical replay at nonce-PDA creation, before our code runs', async () => {
     const channelId = nextChannel();
     const first = await escrowTip(channelId, h.ONE_USDC, inAnHour());
     const second = await escrowTip(channelId, h.ONE_USDC, inAnHour());

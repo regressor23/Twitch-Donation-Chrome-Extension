@@ -1,0 +1,250 @@
+TipVault — S2c: seeds/init мутації, typecheck пакета програми
+host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64  date: 2026-09-18T23:16:49+00:00
+anchor: anchor-cli 1.2.0  solana: solana-cli 4.2.2 (src:c9c6f328; feat:21b0d33a, client:Agave)  node: v24.16.0
+fresh validator up, wallet 500000500 SOL
+
+############ 1. control ############
+ ✓ tests/tip_vault.test.ts (18 tests) 30565ms
+   ✓ tip_direct (3)
+     ✓ moves tokens straight to the streamer and carries the memo 1660ms
+     ✓ rejects a tip below the minimum 1274ms
+     ✓ rejects a memo over 300 bytes 1233ms
+   ✓ tip_escrow (3)
+     ✓ locks the tip in the vault and records it 436ms
+   ✓ claim (9)
+     ✓ pays the attested streamer, creating their token account on the way 1237ms
+     ✓ stops a byte-identical replay at nonce-PDA creation, before our code runs 1681ms
+     ✓ refuses an attestation signed for another channel 841ms
+     ✓ refuses an attestation signed for another recipient 1251ms
+     ✓ refuses an expired attestation 836ms
+     ✓ refuses a signature from the wrong key 1255ms
+     ✓ refuses an attestation whose message lives in another instruction 838ms
+     ✓ refuses to settle the same tip twice, even with a fresh attestation 1253ms
+     ✓ refuses to claim a tip that has already expired 4842ms
+   ✓ refund_expired (3)
+     ✓ returns the money to the donor once the tip expires 4597ms
+     ✓ refuses to refund a tip twice 4607ms
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+
+############ 2. mutation A1: nonce removed from UsedNonce seeds (program only) ############
+applied: seeds = [nonce, channel_id]
+    200|       throw new Error(`expected error ${expected}, got: ${message.slic…
+ ❯ tests/tip_vault.test.ts:457:5
+ ❯ Connection.sendEncodedTransaction ../node_modules/.pnpm/@solana+web3.js@1.99.0_bufferutil@4.1.0_typescript@5.9.3/node_modules/@solana/web3.js/lib/index.cjs.js:8405:13
+ ❯ Connection.sendRawTransaction ../node_modules/.pnpm/@solana+web3.js@1.99.0_bufferutil@4.1.0_typescript@5.9.3/node_modules/@solana/web3.js/lib/index.cjs.js:8370:20
+ ❯ sendAndConfirmRawTransaction ../node_modules/.pnpm/@coral-xyz+anchor@0.32.1_bufferutil@4.1.0_typescript@5.9.3/node_modules/@coral-xyz/anchor/dist/cjs/provider.js:260:31
+ ❯ AnchorProvider.sendAndConfirm ../node_modules/.pnpm/@coral-xyz+anchor@0.32.1_bufferutil@4.1.0_typescript@5.9.3/node_modules/@coral-xyz/anchor/dist/cjs/provider.js:99:20
+ ❯ Module.expectAnchorError tests/helpers.ts:193:5
+ ❯ tests/tip_vault.test.ts:457:5
+Serialized Error: { signature: '', transactionMessage: 'Transaction simulation failed: Error processing Instruction 1: custom program error: 0x7d6', transactionLogs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]', 'Program log: Create', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 179 of 193052 compute units', 'Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program 11111111111111111111111111111111 invoke [3]', 'Program 11111111111111111111111111111111 success', 'Program log: Initialize the associated token account', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 37 of 187963 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 233 of 185500 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 13510 of 198473 compute units', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success', 'Program log: AnchorError caused by account: used_nonce. Error Code: ConstraintSeeds. Error Number: 2006. Error Message: A seeds constraint was violated.', 'Program log: Left:', 'Program log: 97as6SrFHQ46bzM4CcyfPdG5rGdj3tAETxM2mujXp7AT', 'Program log: Right:', 'Program log: 9aTegW4VuzxUhDySmPsLdsY15PthhKYwNLGkPECjVYuq', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 29264 of 206000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x7d6' ], transactionError: { message: 'Transaction simulation failed: Error processing Instruction 1: custom program error: 0x7d6', logs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]', 'Program log: Create', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 179 of 193052 compute units', 'Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program 11111111111111111111111111111111 invoke [3]', 'Program 11111111111111111111111111111111 success', 'Program log: Initialize the associated token account', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 37 of 187963 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 233 of 185500 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 13510 of 198473 compute units', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success', 'Program log: AnchorError caused by account: used_nonce. Error Code: ConstraintSeeds. Error Number: 2006. Error Message: A seeds constraint was violated.', 'Program log: Left:', 'Program log: 97as6SrFHQ46bzM4CcyfPdG5rGdj3tAETxM2mujXp7AT', 'Program log: Right:', 'Program log: 9aTegW4VuzxUhDySmPsLdsY15PthhKYwNLGkPECjVYuq', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 29264 of 206000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x7d6' ] }, logs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]', 'Program log: Create', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 179 of 193052 compute units', 'Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program 11111111111111111111111111111111 invoke [3]', 'Program 11111111111111111111111111111111 success', 'Program log: Initialize the associated token account', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 37 of 187963 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 233 of 185500 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 13510 of 198473 compute units', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success', 'Program log: AnchorError caused by account: used_nonce. Error Code: ConstraintSeeds. Error Number: 2006. Error Message: A seeds constraint was violated.', 'Program log: Left:', 'Program log: 97as6SrFHQ46bzM4CcyfPdG5rGdj3tAETxM2mujXp7AT', 'Program log: Right:', 'Program log: 9aTegW4VuzxUhDySmPsLdsY15PthhKYwNLGkPECjVYuq', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 29264 of 206000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x7d6' ], getLogs: 'Function<getLogs>' }
+ FAIL  tests/tip_vault.test.ts > claim > refuses to settle the same tip twice, even with a fresh attestation
+ ❯ Connection.sendEncodedTransaction ../node_modules/.pnpm/@solana+web3.js@1.99.0_bufferutil@4.1.0_typescript@5.9.3/node_modules/@solana/web3.js/src/connection.ts:6087:13
+ ❯ Connection.sendRawTransaction ../node_modules/.pnpm/@solana+web3.js@1.99.0_bufferutil@4.1.0_typescript@5.9.3/node_modules/@solana/web3.js/src/connection.ts:6043:20
+ ❯ sendAndConfirmRawTransaction ../node_modules/.pnpm/@coral-xyz+anchor@0.32.1_bufferutil@4.1.0_typescript@5.9.3/node_modules/@coral-xyz/anchor/src/provider.ts:396:25
+ ❯ AnchorProvider.sendAndConfirm ../node_modules/.pnpm/@coral-xyz+anchor@0.32.1_bufferutil@4.1.0_typescript@5.9.3/node_modules/@coral-xyz/anchor/src/provider.ts:167:14
+ ❯ tests/tip_vault.test.ts:468:5
+ FAIL  tests/tip_vault.test.ts > claim > refuses to claim a tip that has already expired
+Error: expected error ExpiredEscrow, got: Error: Simulation failed. 
+ ❯ Module.expectAnchorError tests/helpers.ts:200:13
+    199|     if (!message.includes(expected)) {
+    200|       throw new Error(`expected error ${expected}, got: ${message.slic…
+ ❯ tests/tip_vault.test.ts:496:5
+ ❯ Connection.sendEncodedTransaction ../node_modules/.pnpm/@solana+web3.js@1.99.0_bufferutil@4.1.0_typescript@5.9.3/node_modules/@solana/web3.js/lib/index.cjs.js:8405:13
+ ❯ Connection.sendRawTransaction ../node_modules/.pnpm/@solana+web3.js@1.99.0_bufferutil@4.1.0_typescript@5.9.3/node_modules/@solana/web3.js/lib/index.cjs.js:8370:20
+ ❯ sendAndConfirmRawTransaction ../node_modules/.pnpm/@coral-xyz+anchor@0.32.1_bufferutil@4.1.0_typescript@5.9.3/node_modules/@coral-xyz/anchor/dist/cjs/provider.js:260:31
+ ❯ AnchorProvider.sendAndConfirm ../node_modules/.pnpm/@coral-xyz+anchor@0.32.1_bufferutil@4.1.0_typescript@5.9.3/node_modules/@coral-xyz/anchor/dist/cjs/provider.js:99:20
+ ❯ Module.expectAnchorError tests/helpers.ts:193:5
+ ❯ tests/tip_vault.test.ts:496:5
+Serialized Error: { signature: '', transactionMessage: 'Transaction simulation failed: Error processing Instruction 1: custom program error: 0x7d6', transactionLogs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]', 'Program log: Create', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 179 of 184052 compute units', 'Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program 11111111111111111111111111111111 invoke [3]', 'Program 11111111111111111111111111111111 success', 'Program log: Initialize the associated token account', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 37 of 178963 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 233 of 176500 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 16510 of 192473 compute units', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success', 'Program log: AnchorError caused by account: used_nonce. Error Code: ConstraintSeeds. Error Number: 2006. Error Message: A seeds constraint was violated.', 'Program log: Left:', 'Program log: 2NdcXJbvLeC6AC8eWXdZ9xixPHbxwjbHmfEjZaTPZ5gt', 'Program log: Right:', 'Program log: EDP5hjBfaZEW6z1HcDxRGMkSS9AbcWzwbkRDfh9hHofX', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 38264 of 203000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x7d6' ], transactionError: { message: 'Transaction simulation failed: Error processing Instruction 1: custom program error: 0x7d6', logs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]', 'Program log: Create', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 179 of 184052 compute units', 'Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program 11111111111111111111111111111111 invoke [3]', 'Program 11111111111111111111111111111111 success', 'Program log: Initialize the associated token account', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 37 of 178963 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 233 of 176500 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 16510 of 192473 compute units', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success', 'Program log: AnchorError caused by account: used_nonce. Error Code: ConstraintSeeds. Error Number: 2006. Error Message: A seeds constraint was violated.', 'Program log: Left:', 'Program log: 2NdcXJbvLeC6AC8eWXdZ9xixPHbxwjbHmfEjZaTPZ5gt', 'Program log: Right:', 'Program log: EDP5hjBfaZEW6z1HcDxRGMkSS9AbcWzwbkRDfh9hHofX', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 38264 of 203000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x7d6' ] }, logs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]', 'Program log: Create', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 179 of 184052 compute units', 'Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program 11111111111111111111111111111111 invoke [3]', 'Program 11111111111111111111111111111111 success', 'Program log: Initialize the associated token account', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 37 of 178963 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 233 of 176500 compute units', 'Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 16510 of 192473 compute units', 'Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success', 'Program log: AnchorError caused by account: used_nonce. Error Code: ConstraintSeeds. Error Number: 2006. Error Message: A seeds constraint was violated.', 'Program log: Left:', 'Program log: 2NdcXJbvLeC6AC8eWXdZ9xixPHbxwjbHmfEjZaTPZ5gt', 'Program log: Right:', 'Program log: EDP5hjBfaZEW6z1HcDxRGMkSS9AbcWzwbkRDfh9hHofX', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 38264 of 203000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x7d6' ], getLogs: 'Function<getLogs>' }
+ Test Files  1 failed (1)
+      Tests  9 failed | 9 passed (18)
+
+############ 3. mutation A2: the same, with the client derivation matched ############
+applied: client derives without the nonce too
+   ❯ claim (9)
+     ✓ pays the attested streamer, creating their token account on the way 1238ms
+     ✓ stops a byte-identical replay at nonce-PDA creation, before our code runs 1680ms
+     ✓ refuses an attestation signed for another channel 838ms
+     ✓ refuses an attestation signed for another recipient 1256ms
+     ✓ refuses an expired attestation 815ms
+     ✓ refuses a signature from the wrong key 1274ms
+     ✓ refuses an attestation whose message lives in another instruction 829ms
+     × refuses to settle the same tip twice, even with a fresh attestation 1265ms
+     ✓ refuses to claim a tip that has already expired 4837ms
+   ✓ refund_expired (3)
+     ✓ refuses to refund before the tip expires 175ms
+     ✓ returns the money to the donor once the tip expires 4598ms
+     ✓ refuses to refund a tip twice 4605ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/tip_vault.test.ts > claim > refuses to settle the same tip twice, even with a fresh attestation
+Error: expected error TipAlreadySettled, got: Error: Simulation failed. 
+ ❯ Module.expectAnchorError tests/helpers.ts:200:13
+    199|     if (!message.includes(expected)) {
+    200|       throw new Error(`expected error ${expected}, got: ${message.slic…
+ ❯ tests/tip_vault.test.ts:476:5
+ ❯ Connection.sendEncodedTransaction ../node_modules/.pnpm/@solana+web3.js@1.99.0_bufferutil@4.1.0_typescript@5.9.3/node_modules/@solana/web3.js/lib/index.cjs.js:8405:13
+ ❯ Connection.sendRawTransaction ../node_modules/.pnpm/@solana+web3.js@1.99.0_bufferutil@4.1.0_typescript@5.9.3/node_modules/@solana/web3.js/lib/index.cjs.js:8370:20
+ ❯ sendAndConfirmRawTransaction ../node_modules/.pnpm/@coral-xyz+anchor@0.32.1_bufferutil@4.1.0_typescript@5.9.3/node_modules/@coral-xyz/anchor/dist/cjs/provider.js:260:31
+ ❯ AnchorProvider.sendAndConfirm ../node_modules/.pnpm/@coral-xyz+anchor@0.32.1_bufferutil@4.1.0_typescript@5.9.3/node_modules/@coral-xyz/anchor/dist/cjs/provider.js:99:20
+ ❯ Module.expectAnchorError tests/helpers.ts:193:5
+ ❯ tests/tip_vault.test.ts:476:5
+Serialized Error: { signature: '', transactionMessage: 'Transaction simulation failed: Error processing Instruction 1: custom program error: 0x0', transactionLogs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program 11111111111111111111111111111111 invoke [2]', 'Allocate: account Address { address: HPS6RDQSCts7VFsNin5xV3enc9inbvz3Bbs8a2L2cqMH, base: None } already in use', 'Program 11111111111111111111111111111111 failed: custom program error: 0x0', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 11616 of 203000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x0' ], transactionError: { message: 'Transaction simulation failed: Error processing Instruction 1: custom program error: 0x0', logs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program 11111111111111111111111111111111 invoke [2]', 'Allocate: account Address { address: HPS6RDQSCts7VFsNin5xV3enc9inbvz3Bbs8a2L2cqMH, base: None } already in use', 'Program 11111111111111111111111111111111 failed: custom program error: 0x0', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 11616 of 203000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x0' ] }, logs: [ 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz invoke [1]', 'Program log: Instruction: Claim', 'Program 11111111111111111111111111111111 invoke [2]', 'Allocate: account Address { address: HPS6RDQSCts7VFsNin5xV3enc9inbvz3Bbs8a2L2cqMH, base: None } already in use', 'Program 11111111111111111111111111111111 failed: custom program error: 0x0', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz consumed 11616 of 203000 compute units', 'Program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz failed: custom program error: 0x0' ], getLogs: 'Function<getLogs>' }
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+
+############ 4. restore, then mutation B: init -> init_if_needed ############
+applied: init -> init_if_needed, no replacement check
+   ✓ tip_direct (3)
+     ✓ moves tokens straight to the streamer and carries the memo 1685ms
+     ✓ rejects a tip below the minimum 1259ms
+     ✓ rejects a memo over 300 bytes 1254ms
+   ✓ tip_escrow (3)
+     ✓ locks the tip in the vault and records it 410ms
+     ✓ rejects an escrow tip below the minimum 8ms
+     ✓ rejects an expiry in the past 8ms
+   ❯ claim (9)
+     ✓ pays the attested streamer, creating their token account on the way 1242ms
+     × stops a byte-identical replay at nonce-PDA creation, before our code runs 2091ms
+     ✓ refuses an attestation signed for another channel 843ms
+     ✓ refuses an attestation signed for another recipient 1260ms
+     ✓ refuses an expired attestation 833ms
+     ✓ refuses a signature from the wrong key 1231ms
+     ✓ refuses an attestation whose message lives in another instruction 862ms
+     ✓ refuses to settle the same tip twice, even with a fresh attestation 1240ms
+     ✓ refuses to claim a tip that has already expired 4851ms
+   ✓ refund_expired (3)
+     ✓ refuses to refund before the tip expires 176ms
+     ✓ returns the money to the donor once the tip expires 4576ms
+     ✓ refuses to refund a tip twice 4610ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/tip_vault.test.ts > claim > stops a byte-identical replay at nonce-PDA creation, before our code runs
+Error: expected the transaction to fail with already in use, but it succeeded
+ ❯ Module.expectAnchorError tests/helpers.ts:202:9
+    202|   throw new Error(`expected the transaction to fail with ${expected}, …
+ ❯ tests/tip_vault.test.ts:307:5
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+
+############ 5. restore + control ############
+(empty above = sources restored)
+ ✓ tests/tip_vault.test.ts (18 tests) 30260ms
+   ✓ tip_direct (3)
+     ✓ moves tokens straight to the streamer and carries the memo 1681ms
+     ✓ rejects a tip below the minimum 1258ms
+     ✓ rejects a memo over 300 bytes 1253ms
+   ✓ tip_escrow (3)
+     ✓ locks the tip in the vault and records it 414ms
+   ✓ claim (9)
+     ✓ pays the attested streamer, creating their token account on the way 1239ms
+     ✓ stops a byte-identical replay at nonce-PDA creation, before our code runs 1656ms
+     ✓ refuses an attestation signed for another channel 860ms
+     ✓ refuses an attestation signed for another recipient 1248ms
+     ✓ refuses an expired attestation 844ms
+     ✓ refuses a signature from the wrong key 1254ms
+     ✓ refuses an attestation whose message lives in another instruction 836ms
+     ✓ refuses to settle the same tip twice, even with a fresh attestation 1255ms
+     ✓ refuses to claim a tip that has already expired 4814ms
+   ✓ refund_expired (3)
+     ✓ returns the money to the donor once the tip expires 4599ms
+     ✓ refuses to refund a tip twice 4605ms
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+
+############ 6. final source state and static checks ############
+(note: the restore in section 5 is a git checkout, i.e. back to HEAD —
+ which at that moment did not yet carry this stage's comment edits. The
+ run below is the one against the final S2c source.)
+
+ program/package.json                                 |  5 ++++-
+ program/programs/tip_vault/src/instructions/claim.rs |  6 ++++++
+ program/tests/helpers.ts                             | 10 +++++++---
+ program/tests/tip_vault.test.ts                      | 13 ++++++++++++-
+ program/vitest.config.ts                             |  1 -
+ 5 files changed, 29 insertions(+), 6 deletions(-)
+--- untracked ---
+?? docs/evidence/S2c-checks.txt
+?? docs/security.md
+?? program/idl/
+?? program/scripts/
+?? program/types/
+
+idl/types drift check:
+idl and types match the build output
+check:idl exit: 0
+
+pnpm -r typecheck (program package included now):
+ext typecheck$ tsc --noEmit
+packages/shared typecheck$ tsc --noEmit
+web typecheck$ tsc --noEmit
+program typecheck$ tsc --noEmit -p tsconfig.json
+packages/shared typecheck: Done
+ext typecheck: Done
+web typecheck: Done
+program typecheck: Done
+typecheck exit: 0
+lint exit: 0
+format:check exit: 1
+      Tests  96 passed (96)
+   Start at  23:20:54
+   Duration  673ms (import 44%, tests 33%, transform 21%, worker 2%)
+
+
+############ 7. control run against the final source ############
+ ✓ tests/tip_vault.test.ts (18 tests) 30380ms
+   ✓ tip_direct (3)
+     ✓ moves tokens straight to the streamer and carries the memo 1695ms
+     ✓ rejects a tip below the minimum 1259ms
+     ✓ rejects a memo over 300 bytes 1254ms
+   ✓ tip_escrow (3)
+     ✓ locks the tip in the vault and records it 399ms
+   ✓ claim (9)
+     ✓ pays the attested streamer, creating their token account on the way 1254ms
+     ✓ stops a byte-identical replay at nonce-PDA creation, before our code runs 1680ms
+     ✓ refuses an attestation signed for another channel 837ms
+     ✓ refuses an attestation signed for another recipient 1258ms
+     ✓ refuses an expired attestation 834ms
+     ✓ refuses a signature from the wrong key 1237ms
+     ✓ refuses an attestation whose message lives in another instruction 854ms
+     ✓ refuses to settle the same tip twice, even with a fresh attestation 1249ms
+     ✓ refuses to claim a tip that has already expired 4844ms
+   ✓ refund_expired (3)
+     ✓ returns the money to the donor once the tip expires 4602ms
+     ✓ refuses to refund a tip twice 4610ms
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+
+############ 8. simulated fresh clone == what CI will see ############
+exported from the index: 72 files
+target/ present in the export? no
+keys/ present in the export?   no
+idl/types present?             yes
+
++ vitest 5.0.1
+
+Done in 497ms using pnpm v12.4.2
+install exit: 0
+$ pnpm -r typecheck
+packages/shared typecheck$ tsc --noEmit
+program typecheck$ tsc --noEmit -p tsconfig.json
+ext typecheck$ tsc --noEmit
+web typecheck$ tsc --noEmit
+packages/shared typecheck: Done
+ext typecheck: Done
+web typecheck: Done
+program typecheck: Done
+fresh-clone typecheck exit: 0
+
+############ 9. format:check after ignoring the generated copies ############
+web/next-env.d.ts
+
+# Copied verbatim from `anchor build` output by program/scripts/sync-idl.mjs.
+# Reformatting them would put them permanently out of step with the build and
+# make `pnpm --filter @tipvault/program check:idl` fail on every run.
+program/idl/
+program/types/
+$ prettier --check .
+Checking formatting...
+All matched files use Prettier code style!
+format:check exit: 
+lint exit: 0

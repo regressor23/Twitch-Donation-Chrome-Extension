@@ -5,7 +5,10 @@
   "type": "module",
   "description": "Anchor program tip_vault (Rust workspace, built with anchor build)",
   "scripts": {
-    "test:localnet": "vitest run"
+    "test:localnet": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "sync:idl": "node scripts/sync-idl.mjs",
+    "check:idl": "node scripts/sync-idl.mjs --check"
   },
   "devDependencies": {
     "@coral-xyz/anchor": "0.32.1",

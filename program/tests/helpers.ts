@@ -23,7 +23,8 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js';
 
-import idl from '../target/idl/tip_vault.json' with { type: 'json' };
+import idl from '../idl/tip_vault.json' with { type: 'json' };
+import type { TipVault } from '../types/tip_vault.js';
 
 export const LOCALNET = 'http://127.0.0.1:8899';
 export const USDC_DECIMALS = 6;
@@ -61,8 +62,11 @@ export function makeProvider(): AnchorProvider {
   return provider;
 }
 
-export function makeProgram(provider: AnchorProvider): Program {
-  return new Program(idl as anchor.Idl, provider);
+export function makeProgram(provider: AnchorProvider): Program<TipVault> {
+  // A JSON import widens every literal to `string`, so the generated type has to
+  // be reapplied by hand. Both sides come out of the same `anchor build` and are
+  // kept in step by scripts/sync-idl.mjs.
+  return new Program<TipVault>(idl as unknown as TipVault, provider);
 }
 
 export function u64le(value: bigint | number): Buffer {
