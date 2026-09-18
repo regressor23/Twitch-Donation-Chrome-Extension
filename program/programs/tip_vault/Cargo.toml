@@ -19,3 +19,11 @@ idl-build = ["anchor-lang/idl-build"]
 
 [dependencies]
 anchor-lang = "1.2.0"
+
+# Anchor's macros expand to cfg checks for features the program does not
+# declare; without this the build prints three warnings on every run.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(feature, values("custom-heap", "custom-panic", "anchor-debug"))',
+  'cfg(target_os, values("solana"))',
+] }
