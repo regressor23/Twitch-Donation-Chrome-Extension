@@ -1,0 +1,123 @@
+TipVault — S2b: деплой tip_vault на devnet
+host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64  date: 2026-09-18T22:56:49+00:00
+anchor: anchor-cli 1.2.0  solana: solana-cli 4.2.2 (src:c9c6f328; feat:21b0d33a, client:Agave)
+
+############ 1. before ############
+payer  3vJKgump81K91cGG4jXiB4aEQ73QSxouYMshNURvurR2: 0 SOL
+program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz: 5 SOL
+so size: 241808 bytes
+rent needed: Rent-exempt minimum: 1.22903488 SOL
+
+############ 2. move the misdirected airdrop off the program address ############
+
+Signature: 5DHVvdLRr9rvzdT776WKGYNPabNSyzaBuwV3fan5BU63nahrqd3qoPoPhqNpfwwvPaaBe9t2ekifd43YwtyfxVG1
+
+transfer exit: 0
+payer  : 4.999995 SOL
+program: 0 SOL
+payer balance parsed: 4.999995
+
+############ 3. deploy ############
+Warning: 'anchor deploy' is deprecated. Use 'anchor program deploy' instead.
+Deploying cluster: https://api.devnet.solana.com
+Upgrade authority: /home/oleksii/.config/solana/id.json
+Deploying program "tip_vault"...
+Program path: /home/oleksii/code/tipvault/program/target/deploy/tip_vault.so...
+Program ID: J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+
+Writing metadata account...
+ ├─ metadata: 54hpAZqLHr5TbrFdFJ6mBcS5Y4akWWy2iWWVonFG9hi3
+ ├─ program: J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+ └─ seed: idl
+
+[Success] Operation executed successfully
+IDL initialized.
+✓ Idl metadata created/updated
+Deploy success
+deploy exit: 0
+
+############ 4. after ############
+
+Program Id: J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+Owner: BPFLoaderUpgradeab1e11111111111111111111111
+ProgramData Address: BJGGCccFSJ4kxjfRDBi6qR9fvKMbbghREaAQH6Ztdhuo
+Authority: 3vJKgump81K91cGG4jXiB4aEQ73QSxouYMshNURvurR2
+Last Deployed In Slot: 500564292
+Data Length: 241808 (0x3b090) bytes
+Balance: 1.22926348 SOL
+
+payer  : 3.752880232 SOL
+buffers left behind (should be none):
+
+Buffer Address                               | Authority                                    | Balance
+
+
+############ 5. on-chain bytes vs the locally tested artifact ############
+Wrote program to /tmp/onchain.so
+local  .so: 241808 bytes  sha256 5d9bf2f65e7327ffb1b5dd457f440278e8c178e42bf13d4e08515c64d172d4a0
+dumped .so: 241808 bytes (the loader pads the account)
+dumped first 241808 bytes: sha256 5d9bf2f65e7327ffb1b5dd457f440278e8c178e42bf13d4e08515c64d172d4a0
+MATCH: the devnet program is byte-for-byte the artifact the 18 tests ran against
+tail beyond 241808 bytes is all zero padding:
+0
+
+############ 6. program id agreement across the repo ############
+keypair      : J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+declare_id!  : J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+Anchor.toml  : tip_vault = "J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz"
+shared       : export const TIP_VAULT_PROGRAM_ID = 'J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz';
+on chain     : 
+
+############ 7. deploy transaction history ############
+4BZbfEtMnMKBm7yqZTCzegEHuPzbrs9JwcqTnP7kW3w5sNeJnBT79N3epWXrLur6UMFwMAGhwdjxpeoqH4JbNdvo
+aS548FWjpjHFhpRh9YfvrfsQP3PZAqpa4gHmdUXBsmCzqawjvuC4AVNJZ6H2hsJeWUW8vZ7UdMAJt5FTiDBHAuP
+29YugTyRvsqatnStL6ztchBstQ6nDTBeeU29YXpJxaThyDHxkFqUxi6G1CD7ydaG5yrTwQaukwLy3iTi7ERhEbeN
+5DHVvdLRr9rvzdT776WKGYNPabNSyzaBuwV3fan5BU63nahrqd3qoPoPhqNpfwwvPaaBe9t2ekifd43YwtyfxVG1
+pM3GRqTrLK3LVd2yUMkDUHZwV9ABWpsJ3yKxDCxcSa6d3StJbXv5HdoNsfmSdQBXjQhNrCVEEUKZwdP1yo3dhXU
+5 transactions found
+
+
+(correction: the 'on chain' line in section 6 came out empty because
+ 'solana program show | head -1' prints the leading blank line; the full
+ output is in section 4 above and shows Program Id J6uAbWr24...)
+
+############ 8. what each of the three new signatures is ############
+--- 4BZbfEtMnMKBm7yqZTCzegEHuPzbrs9JwcqTnP7kW3w5sNeJnBT79N3epWXrLur6UMFwMAGhwdjxpeoqH4JbNdvo
+  Status: Ok
+    Fee: ◎0.000005094
+  Log Messages:
+    Program ComputeBudget111111111111111111111111111111 invoke [1]
+    Program ComputeBudget111111111111111111111111111111 success
+    Program ComputeBudget111111111111111111111111111111 invoke [1]
+    Program ComputeBudget111111111111111111111111111111 success
+    Program ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S invoke [1]
+    Program ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S consumed 636 of 636 compute units
+    Program ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S success
+
+--- aS548FWjpjHFhpRh9YfvrfsQP3PZAqpa4gHmdUXBsmCzqawjvuC4AVNJZ6H2hsJeWUW8vZ7UdMAJt5FTiDBHAuP
+  Status: Ok
+    Fee: ◎0.000005244
+  Log Messages:
+    Program ComputeBudget111111111111111111111111111111 invoke [1]
+    Program ComputeBudget111111111111111111111111111111 success
+    Program ComputeBudget111111111111111111111111111111 invoke [1]
+    Program ComputeBudget111111111111111111111111111111 success
+    Program 11111111111111111111111111111111 invoke [1]
+    Program 11111111111111111111111111111111 success
+    Program ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S invoke [1]
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S consumed 1797 of 1988 compute units
+    Program ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S success
+
+--- 29YugTyRvsqatnStL6ztchBstQ6nDTBeeU29YXpJxaThyDHxkFqUxi6G1CD7ydaG5yrTwQaukwLy3iTi7ERhEbeN
+  Status: Ok
+    Fee: ◎0.00001
+  Log Messages:
+    Program 11111111111111111111111111111111 invoke [1]
+    Program 11111111111111111111111111111111 success
+    Program BPFLoaderUpgradeab1e11111111111111111111111 invoke [1]
+    Program 11111111111111111111111111111111 invoke [2]
+    Program 11111111111111111111111111111111 success
+    Program BPFLoaderUpgradeab1e11111111111111111111111 success
+

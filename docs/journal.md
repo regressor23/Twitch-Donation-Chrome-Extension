@@ -322,3 +322,61 @@ Append-only. Старі записи не редагуються: помилку
 ### Пропозиція на наступний етап
 - **S2b:** спорожнити адресу програми, переконатись, що платник має ≥ 1.5 SOL, `anchor deploy --provider.cluster devnet`, звірити program id на ланцюзі, покласти в журнал підпис транзакції й посилання на explorer. Роботи хвилин на десять.
 - Далі S3 за планом.
+
+---
+
+## S2b — Деплой `tip_vault` на devnet
+- **status:** ready_for_review
+- **date:** 2026-09-19
+- **scope_agreed:** деплой програми на devnet, звірка program id на ланцюзі, посилання на explorer. Окремо доручено в чаті («запусти сам») виконати перенесення devnet-SOL з адреси програми на гаманець-платник — до того я цю команду не запускав і віддавав її тобі.
+- **commit:** COMMIT_PLACEHOLDER
+
+### Зроблено
+- **Повернуто 5 SOL, які фаусет надіслав на адресу програми.** `solana transfer --from keys/tip_vault-devnet.json --fee-payer keys/tip_vault-devnet.json <платник> ALL`, підпис `5DHVvdLRr9rvzdT776WKGYNPabNSyzaBuwV3fan5BU63nahrqd3qoPoPhqNpfwwvPaaBe9t2ekifd43YwtyfxVG1`. Платник отримав 4.999995 SOL, на адресі програми лишився рівно 0 — саме те, чого вимагає лоадер.
+- **Задеплоєно:** `anchor deploy --provider.cluster devnet --program-name tip_vault --program-keypair keys/tip_vault-devnet.json`. Деплой-транзакція `29YugTyRvsqatnStL6ztchBstQ6nDTBeeU29YXpJxaThyDHxkFqUxi6G1CD7ydaG5yrTwQaukwLy3iTi7ERhEbeN` — у ній видно рівно ту пару, через яку ненульовий баланс ламав деплой: `11111111111111111111111111111111` (create_account) і `BPFLoaderUpgradeab1e11111111111111111111111`.
+- **Звірено байти, а не лише адресу.** `solana program dump` з devnet дає sha256 `5d9bf2f65e7327ffb1b5dd457f440278e8c178e42bf13d4e08515c64d172d4a0` — точно такий самий, як у локального `target/deploy/tip_vault.so` (241 808 байт); за межами цієї довжини в акаунті самі нулі, ненульових байтів 0. Тобто на devnet лежить той самий артефакт, проти якого пройшли 18 тестів, а не «схожа збірка».
+- **IDL опинився на ланцюзі.** `anchor deploy` у 1.x додатково створює metadata-акаунт із seed `idl`: `54hpAZqLHr5TbrFdFJ6mBcS5Y4akWWy2iWWVonFG9hi3`, транзакції `aS548FWjpjHFhpRh9YfvrfsQP3PZAqpa4gHmdUXBsmCzqawjvuC4AVNJZ6H2hsJeWUW8vZ7UdMAJt5FTiDBHAuP` і `4BZbfEtMnMKBm7yqZTCzegEHuPzbrs9JwcqTnP7kW3w5sNeJnBT79N3epWXrLur6UMFwMAGhwdjxpeoqH4JbNdvo` через `ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S`. Я цього окремо не замовляв — так поводиться сама команда. Шкоди немає, навпаки, клієнт зможе тягнути IDL з мережі; фіксую, бо це витрата з гаманця.
+
+### Змінені файли
+- `docs/evidence/S2b-deploy.txt` (новий) — сирий лог: стан до, перенесення, деплой, `program show`, звірка sha256, історія транзакцій, розбір кожного підпису
+- `docs/journal.md`
+- Коду не змінював. `TIP_VAULT_PROGRAM_ID` і `Anchor.toml` були вписані ще в S2, і адреса збіглася — правити не довелось.
+
+### Перевірка
+Повний лог: `docs/evidence/S2b-deploy.txt`.
+```
+Program Id: J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+Owner: BPFLoaderUpgradeab1e11111111111111111111111
+ProgramData Address: BJGGCccFSJ4kxjfRDBi6qR9fvKMbbghREaAQH6Ztdhuo
+Authority: 3vJKgump81K91cGG4jXiB4aEQ73QSxouYMshNURvurR2
+Last Deployed In Slot: 500564292
+Data Length: 241808 (0x3b090) bytes
+Balance: 1.22926348 SOL
+```
+- Program id збігається у **пʼяти** місцях: кейпара, `declare_id!`, `Anchor.toml [programs.devnet]`, `packages/shared/src/networks.ts`, ланцюг.
+- `solana program show --buffers` — порожньо: жодних завислих буферів і замкнених у них коштів.
+- Витрата: 4.999995 → 3.752880232 SOL, тобто 1.247 SOL. З них 1.22926348 — рента акаунта програми, решта — metadata-акаунт IDL і комісії.
+- Explorer програми: https://explorer.solana.com/address/J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz?cluster=devnet
+- Explorer деплою: https://explorer.solana.com/tx/29YugTyRvsqatnStL6ztchBstQ6nDTBeeU29YXpJxaThyDHxkFqUxi6G1CD7ydaG5yrTwQaukwLy3iTi7ERhEbeN?cluster=devnet
+
+### Як перевірити руками
+1. Відкрити explorer програми (посилання вище): має бути `Executable: Yes`, той самий ProgramData-акаунт і слот 500564292.
+2. У `wsl -d Ubuntu-24.04`: `solana -u devnet program show J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz`.
+3. Звірити байти власноруч, не вірячи журналу:
+   `cd ~/code/tipvault/program && solana -u devnet program dump J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz /tmp/x.so && sha256sum /tmp/x.so target/deploy/tip_vault.so`
+   — обидві суми мають бути `5d9bf2f6…`.
+4. Переконатись, що на адресі програми немає «зайвих» коштів і що платник має ~3.75 SOL: `solana -u devnet balance 3vJKgump81K91cGG4jXiB4aEQ73QSxouYMshNURvurR2`.
+
+### Не зроблено / свідомо відкладено
+- **Тести проти devnet не ганяв.** Набір написаний під локальний валідатор: створює власний мінт, роздає airdrop, спить по 4 секунди в сценаріях протермінування. На devnet це коштувало б SOL і хвилин, а доказ того, що код на ланцюзі тотожний перевіреному, дає збіг sha256. Наскрізний devnet-сценарій — це S3.
+- `[provider] cluster` в `Anchor.toml` лишив `Localnet`: щоденний прогін має йти на локальний валідатор, а деплой у мережу — завжди явним прапорцем, щоб не задеплоїти випадково.
+- **Upgrade authority лишилась на `3vJKgump…`** — програма оновлювана. Це навмисно: до сабміту ще будуть зміни. Питання «зробити `--final` чи перевести на мультисиг» — окреме рішення перед mainnet, і воно за тобою.
+
+### Ризики й відкриті питання
+- **Ключ програми тепер має вагу:** хто має `keys/tip_vault-devnet.json` плюс права upgrade authority, той може підмінити програму на ланцюзі. Обидва ключі — в `program/keys/`, поза git, бекап ти зробив у `Documents/tipvault-keys-backup`. Для mainnet потрібна інша схема зберігання, не файл у домашній теці.
+- Фаусет лімітований (2 запити на 8 годин на акаунт із привʼязаним GitHub). Зараз на платнику 3.75 SOL — вистачить на десяток редеплоїв, але при зміні розміру програми рента перераховується.
+- Ризики з S2 і S2a лишаються чинними: `@coral-xyz/anchor` 0.32.1 проти Anchor 1.2.0, тести програми поза `pnpm typecheck`, `MIN_TIP_AMOUNT` без прив'язки до розрядності мінта.
+
+### Пропозиція на наступний етап
+- S3 за планом — наскрізний алерт на devnet.
+- Перед ним пропоную маленький крок: підключити згенерований `target/types/tip_vault.ts` і додати скрипт `typecheck` у `@tipvault/program`, щоб тести програми перевірялись типами разом з усіма (див. S2a). Пів години.
