@@ -1,0 +1,277 @@
+checks	Set up job	﻿2026-09-18T19:37:59.0403410Z Current runner version: '2.337.0'
+checks	Set up job	2026-09-18T19:37:59.0431177Z ##[group]Runner Image Provisioner
+checks	Set up job	2026-09-18T19:37:59.0432450Z Hosted Compute Agent
+checks	Set up job	2026-09-18T19:37:59.0433126Z Version: 20260828.587
+checks	Set up job	2026-09-18T19:37:59.0433761Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+checks	Set up job	2026-09-18T19:37:59.0434578Z Build Date: 2026-08-28T16:44:25Z
+checks	Set up job	2026-09-18T19:37:59.0435278Z Worker ID: {277d0074-f59b-460b-90d7-86c83057df82}
+checks	Set up job	2026-09-18T19:37:59.0436023Z Azure Region: westus
+checks	Set up job	2026-09-18T19:37:59.0436653Z ##[endgroup]
+checks	Set up job	2026-09-18T19:37:59.0438319Z ##[group]Operating System
+checks	Set up job	2026-09-18T19:37:59.0439068Z Ubuntu
+checks	Set up job	2026-09-18T19:37:59.0439601Z 24.04.5
+checks	Set up job	2026-09-18T19:37:59.0440194Z LTS
+checks	Set up job	2026-09-18T19:37:59.0440769Z ##[endgroup]
+checks	Set up job	2026-09-18T19:37:59.0441325Z ##[group]Runner Image
+checks	Set up job	2026-09-18T19:37:59.0441986Z Image: ubuntu-24.04
+checks	Set up job	2026-09-18T19:37:59.0442780Z Version: 20260907.300.1
+checks	Set up job	2026-09-18T19:37:59.0443834Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260907.300/images/ubuntu/Ubuntu2404-Readme.md
+checks	Set up job	2026-09-18T19:37:59.0445707Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260907.300
+checks	Set up job	2026-09-18T19:37:59.0446726Z ##[endgroup]
+checks	Set up job	2026-09-18T19:37:59.0447948Z ##[group]GITHUB_TOKEN Permissions
+checks	Set up job	2026-09-18T19:37:59.0450247Z Contents: read
+checks	Set up job	2026-09-18T19:37:59.0450891Z Metadata: read
+checks	Set up job	2026-09-18T19:37:59.0451445Z Packages: read
+checks	Set up job	2026-09-18T19:37:59.0452108Z ##[endgroup]
+checks	Set up job	2026-09-18T19:37:59.0454798Z Secret source: Actions
+checks	Set up job	2026-09-18T19:37:59.0456333Z Cache mode: write
+checks	Set up job	2026-09-18T19:37:59.0457064Z Prepare workflow directory
+checks	Set up job	2026-09-18T19:37:59.0814750Z Prepare all required actions
+checks	Set up job	2026-09-18T19:37:59.0867789Z Getting action download info
+checks	Set up job	2026-09-18T19:37:59.4625989Z Download action repository 'actions/checkout@v7' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+checks	Set up job	2026-09-18T19:37:59.5876567Z Download action repository 'pnpm/action-setup@v6' (SHA:0977fd99725f1db4007ccb2928dbb4e90d06cc86)
+checks	Set up job	2026-09-18T19:37:59.9009156Z Download action repository 'actions/setup-node@v7' (SHA:820762786026740c76f36085b0efc47a31fe5020)
+checks	Set up job	2026-09-18T19:38:00.1006009Z Complete job name: checks
+checks	Run actions/checkout@v7	﻿2026-09-18T19:38:00.1816704Z ##[group]Run actions/checkout@v7
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1817618Z with:
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1818176Z   repository: regressor23/Twitch-Donation-Chrome-Extension
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1821950Z   token: ***
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1822837Z   ssh-strict: true
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1823306Z   ssh-user: git
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1823749Z   persist-credentials: true
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1824224Z   clean: true
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1824655Z   sparse-checkout-cone-mode: true
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1825165Z   fetch-depth: 1
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1825591Z   fetch-tags: false
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1826030Z   show-progress: true
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1826480Z   lfs: false
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1826878Z   submodules: false
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1827312Z   set-safe-directory: true
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1827813Z   allow-unsafe-pr-checkout: false
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.1828643Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.2868461Z Syncing repository: regressor23/Twitch-Donation-Chrome-Extension
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.2872184Z ##[group]Getting Git version info
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.2874308Z Working directory is '/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension'
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.2876775Z [command]/usr/bin/git version
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.2965597Z git version 2.55.0
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.2994211Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3004001Z Temporarily overriding HOME='/home/runner/work/_temp/136672f6-ff8d-4cb5-beec-12410b1131ba' before making global git config changes
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3006754Z Adding repository directory to the temporary git global config as a safe directory
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3009541Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3064242Z Deleting the contents of '/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension'
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3067952Z ##[group]Determining repository object format
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3070353Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3072502Z ##[group]Initializing the repository
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3076713Z [command]/usr/bin/git init /home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3205655Z hint: Using 'master' as the name for the initial branch. This default branch name
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3209437Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3211689Z hint: to use in all of your new repositories, which will suppress this warning,
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3213367Z hint: call:
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3214100Z hint:
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3214955Z hint: 	git config --global init.defaultBranch <name>
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3215990Z hint:
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3216958Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3218486Z hint: 'development'. The just-created branch can be renamed via this command:
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3219846Z hint:
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3220706Z hint: 	git branch -m <name>
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3221554Z hint:
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3222952Z hint: Disable this message with "git config set advice.defaultBranchName false"
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3225194Z Initialized empty Git repository in /home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git/
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3233674Z [command]/usr/bin/git remote add origin https://github.com/regressor23/Twitch-Donation-Chrome-Extension
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3277934Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3279257Z ##[group]Disabling automatic garbage collection
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3283284Z [command]/usr/bin/git config --local gc.auto 0
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3322664Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3323745Z ##[group]Setting up auth
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3324388Z Removing SSH command configuration
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3334550Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3374311Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3789084Z Removing HTTP extra header
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3795242Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.3853754Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4082857Z Removing includeIf entries pointing to credentials config files
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4087576Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4127805Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4364996Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4406231Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git.path /home/runner/work/_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4439455Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4477704Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4512523Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4544866Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4546080Z ##[group]Fetching the repository
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.4551367Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e8ea7934c7d7e261893a0347cd4c71303086a239:refs/remotes/origin/main
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8681006Z From https://github.com/regressor23/Twitch-Donation-Chrome-Extension
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8683312Z  * [new ref]         e8ea7934c7d7e261893a0347cd4c71303086a239 -> origin/main
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8695974Z [command]/usr/bin/git branch --list --remote origin/main
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8727357Z   origin/main
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8735715Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8763442Z e8ea7934c7d7e261893a0347cd4c71303086a239
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8768321Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8769459Z ##[group]Determining the checkout info
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8771389Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8773553Z [command]/usr/bin/git sparse-checkout disable
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8830871Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8869529Z ##[group]Checking out the ref
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8872195Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8965629Z Switched to a new branch 'main'
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8970182Z branch 'main' set up to track 'origin/main'.
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.8979006Z ##[endgroup]
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.9028287Z [command]/usr/bin/git log -1 --format=%H
+checks	Run actions/checkout@v7	2026-09-18T19:38:00.9059338Z e8ea7934c7d7e261893a0347cd4c71303086a239
+checks	Run pnpm/action-setup@v6	﻿2026-09-18T19:38:00.9380889Z ##[group]Run pnpm/action-setup@v6
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:00.9382100Z with:
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:00.9383196Z   dest: ~/setup-pnpm
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:00.9384107Z   run_install: null
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:00.9384986Z   cache: false
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:00.9385895Z   cache_dependency_path: pnpm-lock.yaml
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:00.9387125Z   package_json_file: package.json
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:00.9388257Z   standalone: false
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:00.9389128Z ##[endgroup]
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:01.0997361Z ##[group]Running self-installer...
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:03.0380603Z 
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:03.0381215Z added 1 package, and audited 2 packages in 2s
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:03.0381629Z 
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:03.0381788Z 1 package is looking for funding
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:03.0382580Z   run `npm fund` for details
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:03.0390641Z 
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:03.0391265Z found 0 vulnerabilities
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:03.6848154Z Checking for updates...
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:04.0629041Z Switching pnpm from v11.19.0 to v12.4.2...
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:04.5395773Z .../v11/8e1-1a0b606a6d2-b3788127305d9281 | Progress: resolved 1, reused 0, downloaded 0, added 0
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:04.5428527Z .../v11/8e1-1a0b606a6d2-b3788127305d9281 |   +2 +
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:05.0263805Z .../v11/8e1-1a0b606a6d2-b3788127305d9281 | Progress: resolved 2, reused 0, downloaded 2, added 2, done
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:06.4503803Z [WARN] Detected a pnpm v10 installation layout at PNPM_HOME. The pnpm shims at PNPM_HOME have been refreshed so the new version is active, but pnpm v11 expects bins in PNPM_HOME/bin. Run "pnpm setup" to migrate your PATH to the v11 layout.
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:06.4542088Z Successfully updated pnpm to v12.4.2
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:06.5694860Z ##[endgroup]
+checks	Run pnpm/action-setup@v6	2026-09-18T19:38:06.5695678Z Installation Completed!
+checks	Run actions/setup-node@v7	﻿2026-09-18T19:38:06.5931320Z ##[group]Run actions/setup-node@v7
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5931651Z with:
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5931849Z   node-version: 24
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5932070Z   cache: pnpm
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5932602Z   check-latest: false
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5935115Z   token: ***
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5935348Z   package-manager-cache: true
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5935607Z env:
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5935864Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.5936185Z ##[endgroup]
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.7325239Z Found in cache @ /opt/hostedtoolcache/node/24.20.0/x64
+checks	Run actions/setup-node@v7	2026-09-18T19:38:06.7333592Z ##[group]Environment details
+checks	Run actions/setup-node@v7	2026-09-18T19:38:07.2032649Z node: v24.20.0
+checks	Run actions/setup-node@v7	2026-09-18T19:38:07.2034100Z npm: 11.19.0
+checks	Run actions/setup-node@v7	2026-09-18T19:38:07.2034773Z yarn: 1.22.22
+checks	Run actions/setup-node@v7	2026-09-18T19:38:07.2035804Z ##[endgroup]
+checks	Run actions/setup-node@v7	2026-09-18T19:38:07.2058969Z [command]/home/runner/setup-pnpm/node_modules/.bin/bin/pnpm store path --silent
+checks	Run actions/setup-node@v7	2026-09-18T19:38:07.2234223Z /home/runner/setup-pnpm/node_modules/.bin/store/v11
+checks	Run actions/setup-node@v7	2026-09-18T19:38:07.5106666Z pnpm cache is not found
+checks	Run pnpm install --frozen-lockfile	﻿2026-09-18T19:38:07.5253546Z ##[group]Run pnpm install --frozen-lockfile
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.5254079Z ^[[36;1mpnpm install --frozen-lockfile^[[0m
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.5302787Z shell: /usr/bin/bash -e {0}
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.5303146Z env:
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.5303409Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.5303726Z ##[endgroup]
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.5633412Z Scope: all 5 workspace projects
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.5819387Z ? Verifying lockfile against supply-chain policies (214 entries)...
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.7312960Z Downloading @next/swc-linux-x64-gnu@16.3.5: 0.00 B/33.79 MB
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.7381870Z Downloading @img/sharp-libvips-linux-x64@1.3.3: 0.00 B/8.17 MB
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.9293675Z Packages are hard linked from the content-addressable store to the virtual store.
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.9303659Z   Content-addressable store is at: /home/runner/setup-pnpm/node_modules/.bin/store/v11
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:07.9304745Z   Virtual store is at:             node_modules/.pnpm
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:08.3325418Z Downloading @rolldown/binding-linux-x64-gnu@1.2.9: 0.00 B/7.92 MB
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:08.3351033Z Downloading next@16.3.5: 0.00 B/41.74 MB
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:09.3912932Z Progress: resolved 157, reused 0, downloaded 141, added 128
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:10.0072949Z ✓ Lockfile passes supply-chain policies (214 entries in 2.4s)
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:10.0073926Z Lockfile is up to date, resolution step is skipped
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.0097214Z Progress: resolved 157, reused 0, downloaded 157, added 131
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.0999916Z Packages: +157
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1000917Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1162993Z Progress: resolved 157, reused 0, downloaded 157, added 157, done
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1750087Z 
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1750716Z devDependencies:
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1751077Z + @eslint/js 10.0.1
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1751326Z + @types/node 26.6.1
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1751608Z + eslint 10.10.0
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1751844Z + globals 17.12.0
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1752055Z + prettier 3.9.8
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1752672Z + typescript 5.9.3
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1753061Z + typescript-eslint 8.70.0
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1753441Z + vite 8.3.0
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1753795Z + vitest 5.0.1
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1753989Z 
+checks	Run pnpm install --frozen-lockfile	2026-09-18T19:38:11.1784939Z Done in 3.6s using pnpm v12.4.2
+checks	Run pnpm lint	﻿2026-09-18T19:38:11.2225680Z ##[group]Run pnpm lint
+checks	Run pnpm lint	2026-09-18T19:38:11.2225975Z ^[[36;1mpnpm lint^[[0m
+checks	Run pnpm lint	2026-09-18T19:38:11.2263616Z shell: /usr/bin/bash -e {0}
+checks	Run pnpm lint	2026-09-18T19:38:11.2263871Z env:
+checks	Run pnpm lint	2026-09-18T19:38:11.2264126Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+checks	Run pnpm lint	2026-09-18T19:38:11.2264442Z ##[endgroup]
+checks	Run pnpm lint	2026-09-18T19:38:11.2481379Z $ eslint .
+checks	Run pnpm typecheck	﻿2026-09-18T19:38:12.7709897Z ##[group]Run pnpm typecheck
+checks	Run pnpm typecheck	2026-09-18T19:38:12.7710402Z ^[[36;1mpnpm typecheck^[[0m
+checks	Run pnpm typecheck	2026-09-18T19:38:12.7765722Z shell: /usr/bin/bash -e {0}
+checks	Run pnpm typecheck	2026-09-18T19:38:12.7766162Z env:
+checks	Run pnpm typecheck	2026-09-18T19:38:12.7766588Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+checks	Run pnpm typecheck	2026-09-18T19:38:12.7767141Z ##[endgroup]
+checks	Run pnpm typecheck	2026-09-18T19:38:12.8083990Z $ pnpm -r typecheck
+checks	Run pnpm typecheck	2026-09-18T19:38:12.9218677Z ext typecheck$ tsc --noEmit
+checks	Run pnpm typecheck	2026-09-18T19:38:12.9219689Z packages/shared typecheck$ tsc --noEmit
+checks	Run pnpm typecheck	2026-09-18T19:38:12.9225102Z web typecheck$ tsc --noEmit
+checks	Run pnpm typecheck	2026-09-18T19:38:14.2600816Z packages/shared typecheck: Done
+checks	Run pnpm typecheck	2026-09-18T19:38:14.9489813Z ext typecheck: Done
+checks	Run pnpm typecheck	2026-09-18T19:38:15.1868323Z web typecheck: Done
+checks	Run pnpm test	﻿2026-09-18T19:38:15.2195238Z ##[group]Run pnpm test
+checks	Run pnpm test	2026-09-18T19:38:15.2195528Z ^[[36;1mpnpm test^[[0m
+checks	Run pnpm test	2026-09-18T19:38:15.2234226Z shell: /usr/bin/bash -e {0}
+checks	Run pnpm test	2026-09-18T19:38:15.2234501Z env:
+checks	Run pnpm test	2026-09-18T19:38:15.2234753Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+checks	Run pnpm test	2026-09-18T19:38:15.2235256Z ##[endgroup]
+checks	Run pnpm test	2026-09-18T19:38:15.2452540Z $ vitest run
+checks	Run pnpm test	2026-09-18T19:38:15.5703617Z 
+checks	Run pnpm test	2026-09-18T19:38:15.5725317Z ^[[1m^[[30m^[[46m RUN ^[[49m^[[39m^[[22m ^[[36mv5.0.1 ^[[39m^[[90m/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension^[[39m
+checks	Run pnpm test	2026-09-18T19:38:15.5743325Z 
+checks	Run pnpm test	2026-09-18T19:38:15.7387499Z  ^[[32m✓^[[39m tests/smoke.test.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+checks	Run pnpm test	2026-09-18T19:38:15.7425457Z 
+checks	Run pnpm test	2026-09-18T19:38:15.7431500Z ^[[2m Test Files ^[[22m ^[[1m^[[32m1 passed^[[39m^[[22m^[[90m (1)^[[39m
+checks	Run pnpm test	2026-09-18T19:38:15.7433344Z ^[[2m      Tests ^[[22m ^[[1m^[[32m7 passed^[[39m^[[22m^[[90m (7)^[[39m
+checks	Run pnpm test	2026-09-18T19:38:15.7434556Z ^[[2m   Start at ^[[22m 19:38:15
+checks	Run pnpm test	2026-09-18T19:38:15.7437702Z ^[[2m   Duration ^[[22m 162ms^[[2m (transform 51%, import 26%, tests 14%, worker 9%)^[[22m
+checks	Run pnpm test	2026-09-18T19:38:15.7454093Z 
+checks	Post Run actions/setup-node@v7	﻿2026-09-18T19:38:15.7937013Z Post job cleanup.
+checks	Post Run actions/setup-node@v7	2026-09-18T19:38:15.9300020Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension --files-from manifest.txt --use-compress-program zstdmt
+checks	Post Run actions/setup-node@v7	2026-09-18T19:38:18.7150249Z Sent 279579 of 134497307 (0.2%), 0.3 MBs/sec
+checks	Post Run actions/setup-node@v7	2026-09-18T19:38:19.7149856Z Sent 134497307 of 134497307 (100.0%), 64.1 MBs/sec
+checks	Post Run actions/setup-node@v7	2026-09-18T19:38:20.0807321Z Cache saved with the key: node-cache-Linux-x64-pnpm-06319f86179daa3fad0c9580a66480b56d802932228448d0cd8983e2bb133c12
+checks	Post Run pnpm/action-setup@v6	﻿2026-09-18T19:38:20.0926755Z Post job cleanup.
+checks	Post Run pnpm/action-setup@v6	2026-09-18T19:38:20.2386170Z Pruning is unnecessary.
+checks	Post Run actions/checkout@v7	﻿2026-09-18T19:38:20.2594481Z Post job cleanup.
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.3635242Z [command]/usr/bin/git version
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.3707499Z git version 2.55.0
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.3756192Z Temporarily overriding HOME='/home/runner/work/_temp/b9003836-9e5b-4b63-8334-4237761354f2' before making global git config changes
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.3764034Z Adding repository directory to the temporary git global config as a safe directory
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.3766932Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.3813126Z Removing SSH command configuration
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.3822810Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.3886848Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4144134Z Removing HTTP extra header
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4151405Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4196667Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4488504Z Removing includeIf entries pointing to credentials config files
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4493897Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4528521Z includeif.gitdir:/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git.path
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4530733Z includeif.gitdir:/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git/worktrees/*.path
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4532649Z includeif.gitdir:/github/workspace/.git.path
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4534101Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4553644Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git.path
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4595165Z /home/runner/work/_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4608115Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-20072615\-a8ff\-4bd7\-ad8c\-c70a61118172\.config
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4654128Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git/worktrees/*.path
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4685753Z /home/runner/work/_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4696876Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/Twitch-Donation-Chrome-Extension/Twitch-Donation-Chrome-Extension/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-20072615\-a8ff\-4bd7\-ad8c\-c70a61118172\.config
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4746876Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4774677Z /github/runner_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4782672Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-20072615\-a8ff\-4bd7\-ad8c\-c70a61118172\.config
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4818912Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4845547Z /github/runner_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4853778Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-20072615\-a8ff\-4bd7\-ad8c\-c70a61118172\.config
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.4891782Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+checks	Post Run actions/checkout@v7	2026-09-18T19:38:20.5124366Z Removing credentials config '/home/runner/work/_temp/git-credentials-20072615-a8ff-4bd7-ad8c-c70a61118172.config'
+checks	Complete job	﻿2026-09-18T19:38:20.5265041Z Cleaning up orphan processes

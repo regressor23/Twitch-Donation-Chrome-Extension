@@ -6,10 +6,10 @@ Append-only. Старі записи не редагуються: помилку
 ---
 
 ## S0 — Каркас репозиторію
-- **status:** ready_for_review
+- **status:** accepted
 - **date:** 2026-09-18
 - **scope_agreed:** pnpm-монорепо (`program/`, `web/`, `ext/`, `packages/shared/`, `docs/`) без бізнес-логіки; Next.js у `web/`, Vite+TS у `ext/`, Anchor-скелет у `program/`; зелені `pnpm test` і `pnpm lint`; `.env.example` за §5.5, `.gitignore`, `.worktreeinclude`; `docs/journal.md` з першим записом і `docs/evidence/`. Додатково погоджено в чаті перед стартом: перенести `plan-sequential.md` у `docs/`, додати CI-workflow під `regressor23/Twitch-Donation-Chrome-Extension`, скрипт `pnpm e2e` до S3 не додавати (варіант Б), маніфест з `storage` + `https://*.twitch.tv/*`.
-- **commit:** `S0: каркас репозиторію` — єдиний коміт етапу. Точний хеш вписую при прийнятті: коміт, який містить журнал, не може містити власний хеш.
+- **commit:** e8ea793
 
 ### Зроблено
 - pnpm-воркспейс на 5 проєктів (`tipvault` + 4 пакети), спільні `tsconfig.base.json`, один flat-config ESLint і один `vitest.config.ts` на весь монорепо.
@@ -70,3 +70,8 @@ Append-only. Старі записи не редагуються: помилку
 - **`.gitattributes` додано** (`* text=auto eol=lf` + правила для бінарників). `git add --renormalize .` не змінив жодного файлу — вміст уже був LF, тож ризик CRLF закритий на майбутнє, без переписування історії. Коміт етапу заамендено, бо на той момент нічого ще не було запушено; коміт як був один, так і лишився.
 - **Запушено в `origin`** (`git push -u origin main`), CI запустився вперше. Результат першого прогону впишу сюди при прийнятті етапу.
 - **Знайдено на машині рецензента (не в коді):** у Windows PowerShell 5.1 оператор `&&` не підтримується, і `pnpm` не запускається — `pnpm.ps1 cannot be loaded because running scripts is disabled` (ExecutionPolicy). Обхід без зміни налаштувань: викликати `pnpm.cmd` замість `pnpm`. Саму ExecutionPolicy не чіпав — це системна безпекова настройка, змінює її тільки людина.
+
+### Прийнято
+- **accepted_by:** Олексій, 2026-09-18, у чаті після ручної перевірки: `pnpm.cmd install; pnpm.cmd lint; pnpm.cmd test` — 7 passed, 0 failed; `pnpm.cmd dev:web` — `GET / 200 in 791ms`; `git log` — `e8ea793 (HEAD -> main, origin/main)`, `git status` чистий.
+- **CI:** перший прогін на `e8ea793` зелений, 27 с — `install --frozen-lockfile` → `lint` → `typecheck` → `test`, на Linux теж `Tests 7 passed (7)`. Прогін: https://github.com/regressor23/Twitch-Donation-Chrome-Extension/actions/runs/35387012761, повний лог — `docs/evidence/S0-ci-run.txt`.
+- Шум `ObjectMultiplex - orphaned data for stream "metamask-multichain-provider"` у виводі `next dev` — це лог MetaMask з Firefox-профілю рецензента, який Next 16 пересилає в термінал. До коду проєкту стосунку не має.
