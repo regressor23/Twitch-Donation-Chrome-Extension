@@ -1,0 +1,145 @@
+TipVault S2 — verification log
+date: 2026-09-18 22:32 UTC
+host: WSL2 Ubuntu 24.04, repo on ext4 at ~/code/tipvault
+
+### versions
+rustc 1.98.1 (48a229cea 2026-09-01)
+solana-cli 4.2.2 (src:c9c6f328; feat:21b0d33a, client:Agave)
+anchor-cli 1.2.0
+v24.16.0
+12.4.2
+
+### program ids (must match in all three places)
+keys/tip_vault-devnet.json : J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+declare_id!                : J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+Anchor.toml (localnet)     : J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+grep: =: No such file or directory
+grep: \K[^]+": No such file or directory
+packages/shared            : 
+attestation authority      : BbEu1A9qFA8MEqBKHar8MnzMJ1m7CbSAwXcEP95gpsy6
+program constant           : BbEu1A9qFA8MEqBKHar8MnzMJ1m7CbSAwXcEP95gpsy6
+
+### cargo test --lib (escrow arithmetic)
+   Compiling tip_vault v0.0.0 (/home/oleksii/code/tipvault/program/programs/tip_vault)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.15s
+     Running unittests src/lib.rs (target/debug/deps/tip_vault-2c8c2f214de8a043)
+
+running 5 tests
+test state::tests::add_escrow_accumulates ... ok
+test state::tests::add_escrow_accepts_the_exact_boundary ... ok
+test state::tests::add_escrow_rejects_overflow_and_leaves_the_total_alone ... ok
+test state::tests::remove_escrow_can_empty_the_vault ... ok
+test state::tests::remove_escrow_rejects_underflow ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+-- exit: 0
+
+### cargo clippy --all-targets (CLAUDE.md 8: deny(clippy::all))
+    Checking tip_vault v0.0.0 (/home/oleksii/code/tipvault/program/programs/tip_vault)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.86s
+-- exit: 0
+
+### anchor build
+   Compiling tip_vault v0.0.0 (/home/oleksii/code/tipvault/program/programs/tip_vault)
+    Finished `release` profile [optimized] target(s) in 1.29s
+   Compiling tip_vault v0.0.0 (/home/oleksii/code/tipvault/program/programs/tip_vault)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.52s
+     Running unittests src/lib.rs (/home/oleksii/code/tipvault/program/target/debug/deps/tip_vault-4430f74460b6c0c8)
+-- exit: 0
+tip_vault.so: 241808 bytes
+
+### localnet suite (fresh validator)
+    Finished `release` profile [optimized] target(s) in 0.11s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running unittests src/lib.rs (/home/oleksii/code/tipvault/program/target/debug/deps/tip_vault-4430f74460b6c0c8)
+Deploying cluster: http://127.0.0.1:8899
+Upgrade authority: /home/oleksii/.config/solana/id.json
+Deploying program "tip_vault"...
+Program path: /home/oleksii/code/tipvault/program/target/deploy/tip_vault.so...
+Program ID: J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+Deploy success
+
+Found a 'test' script in the Anchor.toml. Running it as a test suite!
+
+Running test suite: "/home/oleksii/code/tipvault/program/Anchor.toml"
+
+$ vitest run
+
+ RUN  v5.0.1 /home/oleksii/code/tipvault/program
+
+stderr | tests/tip_vault.test.ts
+bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)
+
+ ✓ tests/tip_vault.test.ts (17 tests) 29603ms
+   ✓ tip_direct (3)
+     ✓ moves tokens straight to the streamer and carries the memo 1676ms
+     ✓ rejects a tip below the minimum 1247ms
+     ✓ rejects a memo over 300 bytes 1266ms
+   ✓ tip_escrow (3)
+     ✓ locks the tip in the vault and records it 414ms
+   ✓ claim (8)
+     ✓ pays the attested streamer, creating their token account on the way 1239ms
+     ✓ refuses to replay the same attestation 1670ms
+     ✓ refuses an attestation signed for another channel 846ms
+     ✓ refuses an attestation signed for another recipient 1259ms
+     ✓ refuses an expired attestation 833ms
+     ✓ refuses a signature from the wrong key 1255ms
+     ✓ refuses to settle the same tip twice, even with a fresh attestation 1255ms
+     ✓ refuses to claim a tip that has already expired 4840ms
+   ✓ refund_expired (3)
+     ✓ returns the money to the donor once the tip expires 4593ms
+     ✓ refuses to refund a tip twice 4605ms
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  22:32:26
+   Duration  29.89s (tests 99%, import 1%)
+
+-- exit: 0
+
+### devnet deploy — BLOCKED, faucet rate limit
+$ solana --url devnet balance
+0 SOL
+$ solana --url devnet airdrop 1
+Error: airdrop request failed. This can happen when the rate limit is reached.
+rent needed for 241808 bytes:
+Rent-exempt minimum: 1.22903488 SOL
+
+
+### mutation matrix — does the suite actually catch a broken program?
+Each mutation breaks one security check, rebuilds, redeploys and reruns
+the whole suite. A mutation that changes nothing means the defence is
+not covered by any test.
+### baseline (no mutation)
+  Tests  17 passed (17)
+
+==================================================================
+MUTATION: attestation: drop the message comparison
+==================================================================
+  × refuses an attestation signed for another channel 1235ms
+  × refuses an attestation signed for another recipient 1684ms
+  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+  Tests  2 failed | 15 passed (17)
+
+==================================================================
+MUTATION: attestation: drop the authority pubkey check
+==================================================================
+  × refuses a signature from the wrong key 1665ms
+  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+  Tests  1 failed | 16 passed (17)
+
+==================================================================
+MUTATION: attestation: drop the offsets-point-into-this-instruction check
+==================================================================
+  Tests  17 passed (17)
+
+==================================================================
+MUTATION: claim: drop the expired-tip check
+==================================================================
+  × refuses to claim a tip that has already expired 4999ms
+  ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+  Tests  1 failed | 16 passed (17)
+
+### restored, control run
+  Tests  17 passed (17)

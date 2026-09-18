@@ -2,5 +2,15 @@
   "name": "@tipvault/program",
   "version": "0.0.0",
   "private": true,
-  "description": "Anchor program tip_vault (Rust workspace, built with anchor build)"
+  "type": "module",
+  "description": "Anchor program tip_vault (Rust workspace, built with anchor build)",
+  "scripts": {
+    "test:localnet": "vitest run"
+  },
+  "devDependencies": {
+    "@coral-xyz/anchor": "0.32.1",
+    "@solana/spl-token": "^0.4.15",
+    "@solana/web3.js": "^1.99.0",
+    "vitest": "^5.0.1"
+  }
 }

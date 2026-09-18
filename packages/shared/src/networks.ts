@@ -20,10 +20,11 @@ export const USDC_MINT: Readonly<Record<Cluster, string>> = {
 };
 
 /**
- * PLACEHOLDER — the Anchor template id, same as in `program/`. The real program
- * id is generated and deployed in S2 and replaces this constant then.
+ * Program id of `tip_vault`, generated in S2 from program/keys/tip_vault-devnet.json
+ * and pinned in `declare_id!` and Anchor.toml. Same address on devnet and, later,
+ * on mainnet: the keypair is ours.
  */
-export const TIP_VAULT_PROGRAM_ID = 'Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS';
+export const TIP_VAULT_PROGRAM_ID = 'J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz';
 
 /** $1.00 in USDC minor units — the on-chain `AmountTooSmall` floor (CLAUDE.md 5.2). */
 export const MIN_TIP = 1_000_000n;

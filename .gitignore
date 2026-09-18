@@ -14,7 +14,7 @@ next-env.d.ts
 target/
 .anchor/
 test-ledger/
-program/keypairs/
+program/keys/
 
 # env & secrets
 .env

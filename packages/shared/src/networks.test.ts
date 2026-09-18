@@ -58,3 +58,9 @@ describe('default cluster', () => {
     expect(DEFAULT_CLUSTER).toBe('devnet');
   });
 });
+
+describe('program id', () => {
+  it('is no longer the Anchor template placeholder', () => {
+    expect(TIP_VAULT_PROGRAM_ID).not.toBe('Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS');
+  });
+});
