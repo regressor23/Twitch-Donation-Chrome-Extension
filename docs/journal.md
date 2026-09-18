@@ -75,3 +75,64 @@ Append-only. Старі записи не редагуються: помилку
 - **accepted_by:** Олексій, 2026-09-18, у чаті після ручної перевірки: `pnpm.cmd install; pnpm.cmd lint; pnpm.cmd test` — 7 passed, 0 failed; `pnpm.cmd dev:web` — `GET / 200 in 791ms`; `git log` — `e8ea793 (HEAD -> main, origin/main)`, `git status` чистий.
 - **CI:** перший прогін на `e8ea793` зелений, 27 с — `install --frozen-lockfile` → `lint` → `typecheck` → `test`, на Linux теж `Tests 7 passed (7)`. Прогін: https://github.com/regressor23/Twitch-Donation-Chrome-Extension/actions/runs/35387012761, повний лог — `docs/evidence/S0-ci-run.txt`.
 - Шум `ObjectMultiplex - orphaned data for stream "metamask-multichain-provider"` у виводі `next dev` — це лог MetaMask з Firefox-профілю рецензента, який Next 16 пересилає в термінал. До коду проєкту стосунку не має.
+
+---
+
+## S1 — packages/shared: memo-кодек, типи, networks
+- **status:** ready_for_review
+- **date:** 2026-09-18
+- **scope_agreed:** `memo.ts` (encode/decode за §5.1), `types.ts` (`Tip`, `Channel`, `ResolveResponse`, `AlertEvent`, статуси `seen|confirmed|alerted`), `networks.ts` (мінти USDC mainnet/devnet, пресети, мінімальний тіп, program id-заглушка), юніт- і фазз-тести на кодек. Погоджено в чаті перед стартом: `fast-check` як dev-залежність; ліміти = 24/180 графем **і** 300 байт на все memo; `decode` поблажливий до перевищення лімітів (клампить, не віддає `null`); wire-DTO із сумами десятковими рядками замість `bigint`.
+- **commit:** `S1: packages/shared — memo-кодек, типи, networks` — єдиний коміт етапу. Точний хеш вписую при прийнятті, як і в S0.
+
+### Зроблено
+- Кодек `tv1|<channel_id>|<nick>|<message>` з одним спільним санітайзером на обидва напрямки: що `encodeMemo` не кладе в ланцюг, те `decodeMemo` не віддає в UI. Викидаються роздільник, C0/C1-контрольні, ZWSP, самотні сурогати й bidi-оверрайди (`U+202A–202E`, `U+2066–2069`) — останні саме тому, що цей текст рендериться на оверлеї стримера. ZWJ і variation selectors збережені, інакше складені емодзі розсипаються.
+- Обрізання по графемних кластерах через `Intl.Segmenter` з бюджетом у UTF-8 байтах: спершу ліміт 24/180 графем, потім жорсткий стель 300 байт, де нік тримає своє місце, а решту бюджету забирає повідомлення. Жодна графема не ріжеться навпіл.
+- `decodeMemo` — тотальна функція: приймає `string` і `Uint8Array` (memo з ланцюга — це байти), на невалідному UTF-8 і самотніх сурогатах віддає `null`, на незнайомій версії (`tv2`, `TV1`, чужий протокол) — теж `null`, і не кидає виняток ні на чому.
+- `types.ts`: доменні суми — `bigint` у мінорних юнітах, wire-DTO — десяткові рядки, бо `JSON.stringify(1n)` кидає, а «полагодити» це зазвичай пробують через `Number()`, що й губить копійки. Конвертери `toU64String`/`fromU64String` валідують діапазон u64 і канонічність рядка.
+- `networks.ts`: обидва мінти звірені з мережею перед тим, як їх вписати (деталі в «Перевірка»), program id — та сама заглушка, що в `program/`, з коментарем про заміну в S2.
+
+### Змінені файли
+- `packages/shared/src/memo.ts` (новий, 212 рядків)
+- `packages/shared/src/types.ts` (новий, 96)
+- `packages/shared/src/networks.ts` (новий, 37)
+- `packages/shared/src/index.ts` (був `export {}`, тепер barrel, 4)
+- `packages/shared/src/memo.test.ts` (новий, 219)
+- `packages/shared/src/memo.fuzz.test.ts` (новий, 178)
+- `packages/shared/src/networks.test.ts` (новий, 60)
+- `packages/shared/src/types.test.ts` (новий, 47)
+- `packages/shared/package.json` (+`fast-check` у devDependencies), `pnpm-lock.yaml`
+- `ext/public/manifest.json` — **зміни вмісту немає**, тільки CRLF→LF (див. «Ризики»)
+- `docs/evidence/S1-checks.txt` (новий, 265)
+
+### Перевірка
+Сирий вивід усіх команд: `docs/evidence/S1-checks.txt`.
+- `pnpm test` — **95 passed, 0 failed**: smoke 7, `memo.test` 56, `memo.fuzz` 10, `networks.test` 9, `types.test` 13
+- Фазз: 11 property-тверджень по 500 прогонів кожне — приблизно 5 500 згенерованих кейсів за запуск. Генератори: `fc.string({unit:'grapheme'})` (емодзі-послідовності, комбіновані знаки, RTL, CJK), `fc.string({unit:'binary'})`, `fc.uint8Array()` і окремо memo-подібне сміття, щоб гілки парсера реально відвідувались
+- `pnpm lint` — exit 0; `pnpm typecheck` — exit 0 у трьох пакетах; `pnpm format:check` — exit 0
+- **Мутаційна перевірка** (тести не декоративні): (1) обрізання по code points замість графем → 3 падіння, fast-check зменшив контрприклад до `["👩‍👩‍👧", 17, "1"]`; (2) парсер приймає будь-яку версію → 4 падіння. Після відкату sha256 `memo.ts` збігається з початковим і контрольний прогін знову 95 passed — обидва хеші в артефакті
+- **Гейт «типи імпортуються»**: тимчасово підключив `@tipvault/shared` до `web` і `ext`, написав пробний файл з реальними імпортами (`encodeMemo`, `TIP_PRESETS`, `ResolveResponse`, `AlertEvent`, `TipStatus`) — `pnpm typecheck` зелений в обох. Негативний контроль: імпорт неіснуючого символу дав `TS2305`, тобто перевірка справді читала файл, а не проходила повз. Обвʼязку і пробні файли **відкотив**, у коміт вони не входять
+- **Константи звірені з першоджерелами, не з памʼяті:** `getAccountInfo` на mainnet і devnet — обидва SPL Token mint з `decimals: 6`; Jupiter token API для mainnet — `symbol: USDC`, `name: USD Coin`, `isVerified: true`; devnet-адреса — з документації Circle «USDC on testing networks» (сторінка віддається тільки через пошук, прямий fetch блокується 403/404)
+
+### Як перевірити руками
+1. `pnpm.cmd test` — очікувано `95 passed`.
+2. Зламати навмисно: у `packages/shared/src/memo.ts` у функції `toGraphemes` замінити тіло на `return Array.from(value);` і знову запустити `pnpm.cmd test` — мають впасти рівно тести про графеми. Повернути через `git checkout -- packages/shared/src/memo.ts`.
+3. Відкрити `packages/shared/src/memo.test.ts` і переглянути таблиці `decodeMemo — rejects`: там усі шість кейсів із твого списку (порожній рядок, самі роздільники, `|` у ніку, невалідний UTF-8, чужий протокол, `tv2`).
+4. Звірити числа з `docs/evidence/S1-checks.txt` — там і мутаційні прогони, і два sha256.
+
+### Не зроблено / свідомо відкладено
+- `buildTipTx` — S5, як і домовлялись.
+- Жодного мережевого виклику в коді пакета немає: звірка мінтів робилась мною вручну через `curl`, у бандл нічого з цього не потрапляє.
+- `@tipvault/shared` **не** підключений постійно до `web` і `ext` — за умовою етапу «жодного коду поза `packages/shared`». Постійна обвʼязка — один рядок у двох `package.json`, зроблю в S3, коли зʼявиться перший справжній імпорт.
+- `MEMO_PROGRAM_ID` (SPL Memo) свідомо не додавав: не було в обсязі, потрібен буде в S5 разом із `buildTipTx`.
+- Фолбек `toGraphemes` на code points (коли немає `Intl.Segmenter`) тестами не покритий — на наших рантаймах (Node 24, Chrome MV3) ця гілка недосяжна.
+
+### Ризики й відкриті питання
+- **Поблажливість `decode` — це політика, а не технічна дрібниця.** Memo від чужого tv1-клієнта з зайвими `|` склеюється в повідомлення, а завеликий нік обрізається замість `null`. Логіка: тіп уже оплачений транзакцією, ковтати його через зайвий байт гірше. Якщо на пілоті побачимо зловживання — робимо строгий режим, це один рядок.
+- **CRLF-інцидент, який я прогнозував у S0.** `ext/public/manifest.json` отримав CRLF ще в S0 від `git checkout` під час мутаційної перевірки, коли `.gitattributes` ще не існувало, і саме на ньому впав `pnpm format:check`. Нормалізував назад у LF; git показує файл як змінений, але `git diff` порожній — вміст не чіпався. Тепер `.gitattributes` не дасть цьому повторитись.
+- `no-control-regex` довелось глушити в `memo.ts` блоковою директивою з поясненням: правило чесно ловить контрольні символи в регулярці, а ми їх туди кладемо навмисно, бо саме їх і вирізаємо.
+- У тестах усі невидимі символи записані екрануванням `\u{...}`; літеральних контрольних символів у джерелах немає — перевіряється `grep`-скануванням, яке я прогнав перед комітом.
+- `TIP_VAULT_PROGRAM_ID` лишається заглушкою до S2.
+
+### Пропозиція на наступний етап
+- Перед S2 — короткий крок «S1.5: тулчейн» (Rust + Solana CLI + Anchor, імовірно WSL), гейт: `anchor build` на скелеті з S0 проходить. Без нього S2 не почати.
+- Далі S2 за планом: `tip_direct`, `tip_escrow`, `claim`, `refund_expired`, деплой на devnet, реальний program id замість заглушки в `networks.ts` (це буде зміна в `packages/shared`, тобто окреме погодження за §2).

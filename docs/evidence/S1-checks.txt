@@ -1,0 +1,265 @@
+TipVault S1 — verification log
+date: 2026-09-18 20:00 UTC
+
+### versions
+$ node -v
+v24.16.0
+$ pnpm -v
+12.4.2
+
+### install (frozen lockfile)
+$ pnpm install --frozen-lockfile
+Scope: all 5 workspace projects
+✓ Lockfile passes supply-chain policies (verified 5m ago)
+Lockfile is up to date, resolution step is skipped
+Done in 11ms using pnpm v12.4.2
+-- exit code: 0
+
+### lint
+$ pnpm lint
+$ eslint .
+-- exit code: 0
+
+### typecheck
+$ pnpm typecheck
+$ pnpm -r typecheck
+web typecheck$ tsc --noEmit
+packages/shared typecheck$ tsc --noEmit
+ext typecheck$ tsc --noEmit
+packages/shared typecheck: Done
+ext typecheck: Done
+web typecheck: Done
+-- exit code: 0
+
+### test
+$ pnpm test
+$ vitest run
+
+ RUN  v5.0.1 D:/Twitch Donation Chrome Extension
+
+
+ Test Files  5 passed (5)
+      Tests  95 passed (95)
+   Start at  23:00:39
+   Duration  577ms (import 46%, tests 37%, transform 14%, worker 3%)
+
+-- exit code: 0
+
+### format:check
+$ pnpm format:check
+$ prettier --check .
+Checking formatting...
+All matched files use Prettier code style!
+-- exit code: 0
+sha256 memo.ts before mutations: 7cc9a831390d62f5f953d5f94eef2e9248ff50643662d4f94b079773c29077a0
+
+### mutation 1 — truncate by code points instead of grapheme clusters
+$ vitest run
+
+ RUN  v5.0.1 D:/Twitch Donation Chrome Extension
+
+ ❯ packages/shared/src/memo.test.ts (56 tests | 2 failed) 11ms
+   ❯ encodeMemo (8)
+     × never splits a multi-byte grapheme when clipping 4ms
+     × clips the nick by bytes and still leaves room for the message 0ms
+ ❯ packages/shared/src/memo.fuzz.test.ts (10 tests | 1 failed) 108ms
+   ❯ truncation never splits a grapheme (1)
+     × keeps whole clusters only, whatever the budget cuts off 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/shared/src/memo.fuzz.test.ts > truncation never splits a grapheme > keeps whole clusters only, whatever the budget cuts off
+Error: Property failed after 3 tests
+{ seed: 617218866, path: "2:1:0:1:1:0:1", endOnFailure: true }
+Counterexample: ["👩‍👩‍👧",17,"1"]
+Shrunk 6 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ throwIfFailed ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2476:8
+ ❯ reportRunDetails ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2492:14
+ ❯ Module.assert ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2662:7
+ ❯ packages/shared/src/memo.fuzz.test.ts:123:8
+    121|
+    122|   it('keeps whole clusters only, whatever the budget cuts off', () => {
+    123|     fc.assert(
+       |        ^
+    124|       fc.property(
+    125|         fc.constantFrom(...clusters),
+
+Caused by: AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/shared/src/memo.fuzz.test.ts:134:59
+ ❯ Property.predicate ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:1355:99
+ ❯ Property.run ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:1324:24
+ ❯ propertyExecution ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2549:23
+ ❯ run ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2639:91
+ ❯ runIt ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2542:15
+ ❯ check ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2655:14
+ ❯ Module.assert ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2660:14
+ ❯ packages/shared/src/memo.fuzz.test.ts:123:8
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  packages/shared/src/memo.test.ts > encodeMemo > never splits a multi-byte grapheme when clipping
+AssertionError: expected 300 to be 296 // Object.is equality
+
+- Expected
++ Received
+
+- 296
++ 300
+
+ ❯ packages/shared/src/memo.test.ts:126:34
+    124|     // 8 bytes each; the 284-byte budget fits 35 whole clusters (280 b…
+    125|     const memo = encodeMemo({ channelId: '123456789', nick: 'a', messa…
+    126|     expect(memoByteLength(memo)).toBe(296);
+       |                                  ^
+    127|     expect(decodeMemo(memo)?.message).toBe(THUMB.repeat(35));
+    128|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  packages/shared/src/memo.test.ts > encodeMemo > clips the nick by bytes and still leaves room for the message
+AssertionError: expected 98 to be 300 // Object.is equality
+
+- Expected
++ Received
+
+- 300
++ 98
+
+ ❯ packages/shared/src/memo.test.ts:135:34
+    133|     const memo = encodeMemo({ channelId: '1', nick: FAMILY.repeat(24),…
+    134|     const decoded = decodeMemo(memo);
+    135|     expect(memoByteLength(memo)).toBe(300);
+       |                                  ^
+    136|     expect(decoded?.nick).toBe(FAMILY.repeat(16));
+    137|     expect(decoded?.message).toBe('hello');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  3 failed | 92 passed (95)
+   Start at  23:00:41
+   Duration  477ms (import 56%, tests 25%, transform 15%, worker 4%)
+
+[ELIFECYCLE] Test failed. See above for more details.
+-- exit code: 1 (non-zero is the expected result)
+
+### mutation 2 — accept any memo version, not just tv1
+$ vitest run
+
+ RUN  v5.0.1 D:/Twitch Donation Chrome Extension
+
+ ❯ packages/shared/src/memo.test.ts (56 tests | 3 failed) 13ms
+   ❯ decodeMemo — rejects (16)
+     × unknown future version -> null 4ms
+     × older version -> null 1ms
+     × wrong case -> null 0ms
+ ❯ packages/shared/src/memo.fuzz.test.ts (10 tests | 1 failed) 209ms
+   ❯ decodeMemo — total function (3)
+     × rejects every version that is not tv1 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/shared/src/memo.fuzz.test.ts > decodeMemo — total function > rejects every version that is not tv1
+Error: Property failed after 1 tests
+{ seed: -881255462, path: "0:0:0:0", endOnFailure: true }
+Counterexample: ["\u0000","1"]
+Shrunk 3 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ throwIfFailed ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2476:8
+ ❯ reportRunDetails ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2492:14
+ ❯ Module.assert ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2662:7
+ ❯ packages/shared/src/memo.fuzz.test.ts:155:8
+    153|
+    154|   it('rejects every version that is not tv1', () => {
+    155|     fc.assert(
+       |        ^
+    156|       fc.property(
+    157|         fc
+
+Caused by: AssertionError: expected { Object (version, channelId, ...) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "channelId": "1",
+  "message": "hi",
+  "nick": "nick",
+  "version": "tv1",
+}
+
+ ❯ packages/shared/src/memo.fuzz.test.ts:162:65
+ ❯ Property.predicate ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:1355:99
+ ❯ Property.run ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:1324:24
+ ❯ propertyExecution ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2549:23
+ ❯ run ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2639:91
+ ❯ runIt ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2542:15
+ ❯ check ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2655:14
+ ❯ Module.assert ../Twitch%20Donation%20Chrome%20Extension/node_modules/.pnpm/fast-check@4.10.1/node_modules/fast-check/lib/fast-check.js:2660:14
+ ❯ packages/shared/src/memo.fuzz.test.ts:155:8
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  packages/shared/src/memo.test.ts > decodeMemo — rejects > unknown future version -> null
+ FAIL  packages/shared/src/memo.test.ts > decodeMemo — rejects > older version -> null
+ FAIL  packages/shared/src/memo.test.ts > decodeMemo — rejects > wrong case -> null
+AssertionError: expected { version: 'tv1', …(3) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "channelId": "123",
+  "message": "hi",
+  "nick": "nick",
+  "version": "tv1",
+}
+
+ ❯ packages/shared/src/memo.test.ts:159:29
+    157|     ['separator before the version', '|tv1|1|nick|hi'],
+    158|   ])('%s -> null', (_name, raw) => {
+    159|     expect(decodeMemo(raw)).toBeNull();
+       |                             ^
+    160|   });
+    161|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  4 failed | 91 passed (95)
+   Start at  23:00:42
+   Duration  592ms (import 47%, tests 36%, transform 14%, worker 2%)
+
+[ELIFECYCLE] Test failed. See above for more details.
+-- exit code: 1 (non-zero is the expected result)
+sha256 memo.ts after restore:   7cc9a831390d62f5f953d5f94eef2e9248ff50643662d4f94b079773c29077a0
+
+### control run on the restored tree
+$ pnpm test
+$ vitest run
+
+ RUN  v5.0.1 D:/Twitch Donation Chrome Extension
+
+
+ Test Files  5 passed (5)
+      Tests  95 passed (95)
+   Start at  23:00:43
+   Duration  657ms (import 48%, tests 35%, transform 14%, worker 2%)
+
+-- exit code: 0

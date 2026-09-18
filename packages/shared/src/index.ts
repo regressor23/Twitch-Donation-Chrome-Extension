@@ -1,3 +1,4 @@
-// Shared contracts for every TipVault surface (web, ext, program clients).
-// Intentionally empty at S0: memo codec, types and network config land in S1.
-export {};
+// Public surface of @tipvault/shared, consumed by web, ext and mobile.
+export * from './memo.js';
+export * from './networks.js';
+export * from './types.js';
