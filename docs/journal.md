@@ -79,10 +79,10 @@ Append-only. Старі записи не редагуються: помилку
 ---
 
 ## S1 — packages/shared: memo-кодек, типи, networks
-- **status:** ready_for_review
+- **status:** accepted
 - **date:** 2026-09-18
 - **scope_agreed:** `memo.ts` (encode/decode за §5.1), `types.ts` (`Tip`, `Channel`, `ResolveResponse`, `AlertEvent`, статуси `seen|confirmed|alerted`), `networks.ts` (мінти USDC mainnet/devnet, пресети, мінімальний тіп, program id-заглушка), юніт- і фазз-тести на кодек. Погоджено в чаті перед стартом: `fast-check` як dev-залежність; ліміти = 24/180 графем **і** 300 байт на все memo; `decode` поблажливий до перевищення лімітів (клампить, не віддає `null`); wire-DTO із сумами десятковими рядками замість `bigint`.
-- **commit:** `S1: packages/shared — memo-кодек, типи, networks` — єдиний коміт етапу. Точний хеш вписую при прийнятті, як і в S0.
+- **commit:** 86543fd
 
 ### Зроблено
 - Кодек `tv1|<channel_id>|<nick>|<message>` з одним спільним санітайзером на обидва напрямки: що `encodeMemo` не кладе в ланцюг, те `decodeMemo` не віддає в UI. Викидаються роздільник, C0/C1-контрольні, ZWSP, самотні сурогати й bidi-оверрайди (`U+202A–202E`, `U+2066–2069`) — останні саме тому, що цей текст рендериться на оверлеї стримера. ZWJ і variation selectors збережені, інакше складені емодзі розсипаються.
@@ -137,13 +137,17 @@ Append-only. Старі записи не редагуються: помилку
 - Перед S2 — короткий крок «S1.5: тулчейн» (Rust + Solana CLI + Anchor, імовірно WSL), гейт: `anchor build` на скелеті з S0 проходить. Без нього S2 не почати.
 - Далі S2 за планом: `tip_direct`, `tip_escrow`, `claim`, `refund_expired`, деплой на devnet, реальний program id замість заглушки в `networks.ts` (це буде зміна в `packages/shared`, тобто окреме погодження за §2).
 
+### Прийнято
+- **accepted_by:** Олексій, 2026-09-19, у чаті.
+- **CI:** прогін на `86543fd` зелений — install → lint → typecheck → test, на Linux теж `95 passed (95)`: https://github.com/regressor23/Twitch-Donation-Chrome-Extension/actions/runs/35389410191
+
 ---
 
 ## S1.5 — Тулчейн для Anchor (WSL2)
-- **status:** ready_for_review
+- **status:** accepted
 - **date:** 2026-09-18
 - **scope_agreed:** WSL2 + Ubuntu, у ньому Rust / Solana CLI / Anchor / Node+pnpm; правки в `program/Cargo.toml`, `program/Anchor.toml` (і `lib.rs`, якщо без них не збирається) до стану, коли `anchor build` на скелеті S0 проходить. Бізнес-логіки контракту не пишемо, `declare_id` не міняємо — це S2.
-- **commit:** `S1.5: тулчейн — WSL2 + Rust + Solana 4.2.2 + Anchor 1.2.0` — єдиний коміт етапу, точний хеш при прийнятті.
+- **commit:** 9371103
 
 ### Зроблено
 - Діагностика того, чому «вікно Ubuntu не відкрилось»: WSL-платформа була встановлена й робоча (2.7.14, ядро 6.18, віртуалізація увімкнена), але **жодного дистрибутива не було** — `wsl --install` підняв компоненти, а дистрибутив не доїхав. Поставив `Ubuntu-24.04` (свідомо не 26.04: solana platform-tools постачаються бінарниками під старішу glibc).
@@ -188,3 +192,7 @@ Append-only. Старі записи не редагуються: помилку
 ### Пропозиція на наступний етап
 - S2 відкриваємо двома рішеннями на одну репліку: (1) куди кладемо `target/` (пропоную ext4 через обгортку-скрипт у репозиторії, щоб шлях не був зашитий); (2) де живе постійна кейпара програми.
 - Далі S2 за планом: `tip_direct`, `tip_escrow`, `claim`, `refund_expired`, тести на localnet, деплой на devnet, і аж тоді реальний program id у `packages/shared` (це зміна в shared → окреме погодження за §2).
+
+### Прийнято
+- **accepted_by:** Олексій, 2026-09-19, у чаті.
+- **CI:** прогін на `9371103` зелений: https://github.com/regressor23/Twitch-Donation-Chrome-Extension/actions/runs/35399046783. Важливо розуміти межі цього доказу: Anchor у CI свідомо не збирається, тож прогін підтверджує тільки JS-частину. Єдиний доказ того, що контракт збирається, — `docs/evidence/S1.5-toolchain.txt`, знятий локально в WSL.
