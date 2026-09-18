@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "TipVault",
+  "version": "0.0.1",
+  "description": "Tip Twitch streamers in USDC on Solana.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://*.twitch.tv/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}

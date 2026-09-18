@@ -1,0 +1,13 @@
+# Repo and every working copy stay on LF: CI runs on Linux and prettier is
+# configured with endOfLine: lf, so CRLF in a Windows clone would fail the check.
+* text=auto eol=lf
+
+# Binary artefacts: no line-ending translation, no textual diff.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.so binary

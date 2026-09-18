@@ -1,0 +1,7 @@
+packages:
+  - 'web'
+  - 'ext'
+  - 'program'
+  - 'packages/*'
+minimumReleaseAgeExclude:
+  - prettier@3.9.8

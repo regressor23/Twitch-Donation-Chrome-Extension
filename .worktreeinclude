@@ -1,0 +1,5 @@
+# Gitignored files that must follow the repo into a git worktree.
+# The project works strictly in a single tree (CLAUDE.md), this is a safety net only.
+.env
+.env.local
+web/.env.local

@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# rust / anchor
+target/
+.anchor/
+test-ledger/
+program/keypairs/
+
+# env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# tooling caches
+.eslintcache
+coverage/
+playwright-report/
+test-results/
+
+# editors / os
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# claude code local state
+.claude/settings.local.json
