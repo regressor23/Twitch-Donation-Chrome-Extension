@@ -1,4 +1,9 @@
-import { SystemProgram, type PublicKey, type Keypair } from '@solana/web3.js';
+import {
+  SystemProgram,
+  type PublicKey,
+  type Keypair,
+  type TransactionInstruction,
+} from '@solana/web3.js';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import * as h from './helpers.js';
@@ -94,20 +99,10 @@ interface ClaimOptions {
   signed?: { channelId?: bigint; recipient?: PublicKey; nonce?: bigint; expiresAt?: bigint };
 }
 
-async function claim(options: ClaimOptions): Promise<string> {
+async function claimInstruction(options: ClaimOptions): Promise<TransactionInstruction> {
   const { channelId, recipient, tips, nonce, expiresAt } = options;
-  const signer = options.signer ?? authority;
-  const signed = options.signed ?? {};
 
-  const message = h.attestationMessage(
-    programId,
-    signed.channelId ?? channelId,
-    signed.recipient ?? recipient,
-    signed.nonce ?? nonce,
-    signed.expiresAt ?? expiresAt,
-  );
-
-  const claimInstruction = await program.methods
+  return program.methods
     .claim(new BN(channelId.toString()), {
       recipient,
       nonce: new BN(nonce.toString()),
@@ -128,10 +123,23 @@ async function claim(options: ClaimOptions): Promise<string> {
     })
     .remainingAccounts(tips.map((pubkey) => ({ pubkey, isWritable: true, isSigner: false })))
     .instruction();
+}
+
+async function claim(options: ClaimOptions): Promise<string> {
+  const signer = options.signer ?? authority;
+  const signed = options.signed ?? {};
+
+  const message = h.attestationMessage(
+    programId,
+    signed.channelId ?? options.channelId,
+    signed.recipient ?? options.recipient,
+    signed.nonce ?? options.nonce,
+    signed.expiresAt ?? options.expiresAt,
+  );
 
   return h.sendWithSigners(
     provider,
-    [h.ed25519Instruction(signer, message), claimInstruction],
+    [h.ed25519Instruction(signer, message), await claimInstruction(options)],
     [claimer],
   );
 }
@@ -371,6 +379,72 @@ describe('claim', () => {
           expiresAt: inAnHour(),
           signer: forger,
         }),
+      'BadAttestation',
+    );
+  });
+
+  /**
+   * The subtle one. Offsets inside an ed25519 instruction may point at another
+   * instruction of the same transaction, and the native program reads the
+   * message from there. So an attacker holding a genuine attestation for their
+   * own channel can have the signature checked against that real message, while
+   * the bytes at the same offset inside the ed25519 instruction itself spell out
+   * the claim `tip_vault` is about to verify. Both sides see what they expect,
+   * and the escrow of a channel nobody attested for walks out the door.
+   *
+   * The only thing standing between the two is the check that every offset says
+   * "this instruction".
+   */
+  it('refuses an attestation whose message lives in another instruction', async () => {
+    const attestedChannel = nextChannel();
+    const targetChannel = nextChannel();
+    const { tip } = await escrowTip(targetChannel, 7 * h.ONE_USDC, inAnHour());
+    const attacker = await h.fundedKeypair(provider);
+    const nonce = nextNonce();
+    const expiresAt = inAnHour();
+
+    // What the authority really signed: a claim for a different channel.
+    const attested = h.attestationMessage(
+      programId,
+      attestedChannel,
+      attacker.publicKey,
+      nonce,
+      expiresAt,
+    );
+    // What the program builds for the channel under attack, and what the forged
+    // instruction carries in its own data at the very same offset.
+    const expected = h.attestationMessage(
+      programId,
+      targetChannel,
+      attacker.publicKey,
+      nonce,
+      expiresAt,
+    );
+    expect(attested.length).toBe(expected.length);
+
+    // Sits after the claim, so the program never looks at it; it is only there
+    // to hold the real message for the native program to read.
+    const carrier = h.ed25519Instruction(authority, attested);
+
+    const forged = h.ed25519WithBorrowedMessage({
+      pubkey: authority.publicKey,
+      signature: h.ed25519SignatureOf(carrier),
+      decoyMessage: expected,
+      messageInstructionIndex: 2,
+      messageOffset: h.ED25519_MESSAGE_OFFSET,
+      messageSize: attested.length,
+    });
+
+    const instruction = await claimInstruction({
+      channelId: targetChannel,
+      recipient: attacker.publicKey,
+      tips: [tip],
+      nonce,
+      expiresAt,
+    });
+
+    await h.expectAnchorError(
+      () => h.sendWithSigners(provider, [forged, instruction, carrier], [claimer]),
       'BadAttestation',
     );
   });

@@ -268,3 +268,57 @@ Append-only. Старі записи не редагуються: помилку
 ### Пропозиція на наступний етап
 - Розбити етап: **S2a** — програма, тести й мутаційна матриця (готове, здаю на перевірку); **S2b** — деплой на devnet, звірка program id на ланцюзі та посилання на explorer, щойно на гаманці зʼявиться ~1.5 SOL. Найшвидший шлях: ти кидаєш devnet-SOL на `3vJKgump81K91cGG4jXiB4aEQ73QSxouYMshNURvurR2` з будь-якого свого гаманця або через `faucet.solana.com`, і S2b закривається за десять хвилин.
 - Перед S3 — один тест на підміну offset-ів, орієнтовно година.
+
+---
+
+## S2a — Тест на підміну offset-ів в ed25519-інструкції
+- **status:** ready_for_review
+- **date:** 2026-09-19
+- **scope_agreed:** за рішенням рецензента S2 розбито на S2a (програма, тести, мутаційна матриця) і S2b (деплой на devnet, звірка program id на ланцюзі, посилання на explorer). Окремо погоджено один тест поза початковим списком із пʼяти — підміна offset-ів в ed25519-інструкції.
+- **commit:** COMMIT_PLACEHOLDER
+
+### Зроблено
+- **Закрито єдину діру мутаційної матриці S2.** Тест `refuses an attestation whose message lives in another instruction` відтворює атаку повністю, а не імітує її. Транзакція складається з трьох інструкцій: підроблена ed25519, `claim`, і «носій». Носій стоїть **після** `claim` — програма його навіть не переглядає, бо цикл перевірки йде тільки по інструкціях перед поточною, — і несе справжнє повідомлення, яке authority дійсно підписав: атестацію для іншого каналу. Підроблена ed25519-інструкція віддає нативній програмі цей справжній підпис і вказує `message_instruction_index = 2`, тобто «текст бери з носія», а у власних даних за тим самим зсувом 112 тримає те повідомлення, яке `tip_vault` збирає сам. Нативна програма звіряє підпис зі справжнім текстом і каже «ок»; програма без перевірки індексів читає підкладені байти й теж каже «ок».
+- **Підпис у тесті не підроблений.** Він витягується з нормально зібраної `Ed25519Program.createInstructionWithPrivateKey` (байти 48..112) — це справжній підпис справжнього ключа authority, рівно як було б у реальній атаці. Тест не має жодного способу підробити підпис і не намагається.
+- **Хелпери** `ed25519WithBorrowedMessage` і `ed25519SignatureOf` збирають інструкцію побайтово за розкладкою web3.js: заголовок 2 байти, offsets 14, публічний ключ на 16, підпис на 48, повідомлення на 112.
+- **Рефакторинг:** збірка інструкції `claim` винесена з `claim()` в окрему `claimInstruction()`, щоб сценарій міг скласти транзакцію руками. Решта тестів не змінювалась.
+- **Заміряно поведінку деплою на адресу з балансом** — знадобилось через помилку з фаусетом, див. «Не зроблено».
+
+### Змінені файли
+- `program/tests/helpers.ts` (+60)
+- `program/tests/tip_vault.test.ts` (+102 −14)
+- `docs/evidence/S2a-checks.txt` (новий, 137 рядків до дописування) — сирий лог усіх прогонів нижче
+
+### Перевірка
+Повний лог: `docs/evidence/S2a-checks.txt`.
+- `anchor test --skip-local-validator` — **18 passed, 0 failed** (було 17).
+- Прогін виконано **на вже використаному леджері, без `--reset`**: набір лишається повторюваним. Це та сама вимога, через яку в S2 зʼявився `RUN_SEED`.
+- **Мутація.** Прибрано `require!`, що вимагає `signature_ix_index == pubkey_ix_index == message_ix_index == u16::MAX`:
+
+| Зламано | Результат |
+|---|---|
+| перевірка індексів інструкцій в offset-ах | **падає рівно 1 тест — новий** |
+
+  Формулювання падіння важливіше за сам факт: `expected the transaction to fail with BadAttestation, but it succeeded`. Тобто без цієї перевірки транзакція **проходить**, і escrow каналу, за який authority нічого не підписував, їде на гаманець атакувальника. Рядок матриці S2, який читався «17/17 проходять — жоден тест цього не ловить», закрито.
+- Після `git checkout` — контрольний прогін **18 passed**, `git diff` на файлі порожній.
+- `cargo test --lib` — 5 passed. `cargo clippy --all-targets` — exit 0.
+- Корінь: `pnpm lint`, `pnpm typecheck`, `pnpm format:check` — exit 0; `pnpm test` — 96 passed.
+
+### Як перевірити руками
+1. `wsl -d Ubuntu-24.04`, далі `cd ~/code/tipvault/program`.
+2. Валідатор, якщо не піднятий: `solana-test-validator --ledger /tmp/l --reset --quiet &`, потім `solana --url http://127.0.0.1:8899 airdrop 500 $(solana-keygen pubkey ~/.config/solana/id.json)`.
+3. `anchor test --skip-local-validator` — очікувано **18 passed**.
+4. Зламати навмисно: у `programs/tip_vault/src/attestation.rs` прибрати `require!` з трьома порівняннями `== THIS_INSTRUCTION`, повторити п.3. Має впасти рівно один тест — `refuses an attestation whose message lives in another instruction` — і саме з текстом «but it succeeded». Повернути через `git checkout -- programs/tip_vault/src/attestation.rs`.
+5. Звірити числа з `docs/evidence/S2a-checks.txt`.
+
+### Не зроблено / свідомо відкладено
+- **Деплой на devnet — це S2b, і він досі не зроблений.**
+- **5 SOL із фаусета пішли не на ту адресу.** У поле фаусета вставлено program id `J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz` замість гаманця-платника `3vJKgump81K91cGG4jXiB4aEQ73QSxouYMshNURvurR2`. Стан на ланцюзі: платник 0 SOL, адреса програми 5 SOL, owner — System Program, `Executable: false`. Гроші не втрачені (кейпара наша), але **деплой на адресу з ненульовим балансом неможливий**: перевірено на localnet, `Error: Account ... is not an upgradeable program or already in use`; після спорожнення адреси той самий деплой проходить. Обидва прогони в логу, розділ 8. Адресу треба спорожнити командою `solana -u devnet transfer --from program/keys/tip_vault-devnet.json --fee-payer program/keys/tip_vault-devnet.json 3vJKgump81K91cGG4jXiB4aEQ73QSxouYMshNURvurR2 ALL --allow-unfunded-recipient` — після цього на платнику буде близько 5 SOL і S2b закривається без жодного фаусета. Коштами розпоряджається людина, тому команду не запускав.
+
+### Ризики й відкриті питання
+- **Тести програми не входять у `pnpm typecheck`:** у `@tipvault/program` немає скрипта `typecheck`, а `pnpm -r typecheck` обходить пакети без нього. Ручний запуск `tsc --noEmit -p program/tsconfig.json` дає 14 помилок: 13 у `tests/tip_vault.test.ts` — усі через нетипізований `Program` (`program.account.vault`, `program.methods.X` як possibly undefined) — і одна на `minWorkers` у `vitest.config.ts`. Жодна не в новому коді. На виконання це не впливає (vitest транспілює через esbuild, типи не перевіряє), eslint файли проходить. Лікується підключенням згенерованого `target/types/tip_vault.ts`; пропоную окремий маленький крок, бо це виходить за обсяг S2a.
+- Решта ризиків із запису S2 лишається чинною: TS-клієнт `@coral-xyz/anchor` 0.32.1 проти програми на Anchor 1.2.0; ключ attestation потрібен для локальних тестів і лежить поза git; `MIN_TIP_AMOUNT` без прив'язки до розрядності мінта; 241 КБ `.so` = 1.23 SOL за деплой.
+
+### Пропозиція на наступний етап
+- **S2b:** спорожнити адресу програми, переконатись, що платник має ≥ 1.5 SOL, `anchor deploy --provider.cluster devnet`, звірити program id на ланцюзі, покласти в журнал підпис транзакції й посилання на explorer. Роботи хвилин на десять.
+- Далі S3 за планом.

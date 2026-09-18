@@ -1,0 +1,174 @@
+TipVault — S2a: тест на підміну offset-ів в ed25519-інструкції
+host: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64  date: 2026-09-18T22:49:07+00:00
+anchor: anchor-cli 1.2.0  solana: solana-cli 4.2.2 (src:c9c6f328; feat:21b0d33a, client:Agave)  node: v24.16.0
+validator: already running, ledger /tmp/l (NOT reset — a second run over a used
+ledger is itself part of the check: the suite has to be repeatable)
+
+############ 1. control run, unmodified source ############
+Program already exists, upgrading...
+Sending upgrade transaction...
+Signature: 1ArKhCKYduLvXwnbZbXaxRVqy8w1cZZmaJCqJ7THi1WhAHuSzkXmZUJ8VfWBggXJYnLx1kRBZ21ZE8pN4BvYxGz
+Program ID: J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+Deploy success
+Found a 'test' script in the Anchor.toml. Running it as a test suite!
+Running test suite: "/home/oleksii/code/tipvault/program/Anchor.toml"
+$ vitest run
+ RUN  v5.0.1 /home/oleksii/code/tipvault/program
+stderr | tests/tip_vault.test.ts
+bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)
+ ✓ tests/tip_vault.test.ts (18 tests) 30289ms
+   ✓ tip_direct (3)
+     ✓ moves tokens straight to the streamer and carries the memo 1654ms
+     ✓ rejects a tip below the minimum 1280ms
+     ✓ rejects a memo over 300 bytes 1254ms
+   ✓ tip_escrow (3)
+     ✓ locks the tip in the vault and records it 414ms
+   ✓ claim (9)
+     ✓ pays the attested streamer, creating their token account on the way 1239ms
+     ✓ refuses to replay the same attestation 1679ms
+     ✓ refuses an attestation signed for another channel 834ms
+     ✓ refuses an attestation signed for another recipient 1262ms
+     ✓ refuses an expired attestation 834ms
+     ✓ refuses a signature from the wrong key 1254ms
+     ✓ refuses an attestation whose message lives in another instruction 836ms
+     ✓ refuses to settle the same tip twice, even with a fresh attestation 1253ms
+     ✓ refuses to claim a tip that has already expired 4844ms
+   ✓ refund_expired (3)
+     ✓ returns the money to the donor once the tip expires 4595ms
+     ✓ refuses to refund a tip twice 4604ms
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  22:49:14
+   Duration  30.59s (tests 99%, import 1%)
+ANCHOR_EXIT=0
+
+############ 2. mutation: instruction-index check removed ############
+applied
+ program/programs/tip_vault/src/attestation.rs | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+ ❯ tests/tip_vault.test.ts (18 tests | 1 failed) 30998ms
+   ✓ tip_direct (3)
+     ✓ moves tokens straight to the streamer and carries the memo 1676ms
+     ✓ rejects a tip below the minimum 1258ms
+     ✓ rejects a memo over 300 bytes 1252ms
+   ✓ tip_escrow (3)
+     ✓ locks the tip in the vault and records it 396ms
+     ✓ rejects an escrow tip below the minimum 8ms
+     ✓ rejects an expiry in the past 8ms
+   ❯ claim (9)
+     ✓ pays the attested streamer, creating their token account on the way 1258ms
+     ✓ refuses to replay the same attestation 1679ms
+     ✓ refuses an attestation signed for another channel 836ms
+     ✓ refuses an attestation signed for another recipient 1258ms
+     ✓ refuses an expired attestation 833ms
+     ✓ refuses a signature from the wrong key 1236ms
+     × refuses an attestation whose message lives in another instruction 1266ms
+     ✓ refuses to settle the same tip twice, even with a fresh attestation 1261ms
+     ✓ refuses to claim a tip that has already expired 4839ms
+   ✓ refund_expired (3)
+     ✓ refuses to refund before the tip expires 177ms
+     ✓ returns the money to the donor once the tip expires 4596ms
+     ✓ refuses to refund a tip twice 4605ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/tip_vault.test.ts > claim > refuses an attestation whose message lives in another instruction
+Error: expected the transaction to fail with BadAttestation, but it succeeded
+ ❯ Module.expectAnchorError tests/helpers.ts:202:9
+    200|     return;
+    201|   }
+    202|   throw new Error(`expected the transaction to fail with ${expected}, …
+       |         ^
+    203| }
+    204|
+ ❯ tests/tip_vault.test.ts:446:5
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+   Start at  22:49:50
+   Duration  31.28s (tests 99%, import 1%)
+[ELIFECYCLE] Command failed with exit code 1.
+ANCHOR_EXIT=1
+
+############ 3. restore ############
+git diff on program/programs/tip_vault/src/attestation.rs after restore:
+(empty above = source is back to the committed version)
+
+############ 4. post-restore control run ############
+     ✓ refuses an expired attestation 832ms
+     ✓ refuses a signature from the wrong key 1254ms
+     ✓ refuses an attestation whose message lives in another instruction 838ms
+     ✓ refuses to settle the same tip twice, even with a fresh attestation 1231ms
+     ✓ refuses to claim a tip that has already expired 4861ms
+   ✓ refund_expired (3)
+     ✓ returns the money to the donor once the tip expires 4596ms
+     ✓ refuses to refund a tip twice 4608ms
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  22:50:29
+   Duration  30.87s (tests 99%, import 1%)
+ANCHOR_EXIT=0
+
+############ 5. rust side ############
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.73s
+     Running unittests src/lib.rs (target/debug/deps/tip_vault-2c8c2f214de8a043)
+
+running 5 tests
+test state::tests::add_escrow_accepts_the_exact_boundary ... ok
+test state::tests::add_escrow_accumulates ... ok
+test state::tests::add_escrow_rejects_overflow_and_leaves_the_total_alone ... ok
+test state::tests::remove_escrow_can_empty_the_vault ... ok
+test state::tests::remove_escrow_rejects_underflow ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking tip_vault v0.0.0 (/home/oleksii/code/tipvault/program/programs/tip_vault)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.45s
+CLIPPY_EXIT=0
+
+############ 6. root checks ############
+pnpm lint exit: 0
+pnpm typecheck exit: 0
+pnpm format:check exit: 0
+
+ Test Files  5 passed (5)
+      Tests  96 passed (96)
+   Start at  22:51:03
+   Duration  656ms (import 44%, tests 35%, transform 20%, worker 2%)
+
+
+############ 7. devnet state after the faucet request ############
+deploy wallet 3vJKgump81K91cGG4jXiB4aEQ73QSxouYMshNURvurR2:
+0 SOL
+program address J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz:
+
+Public Key: J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+Balance: 5 SOL
+Owner: 11111111111111111111111111111111
+Executable: false
+Rent Epoch: 18446744073709551615
+
+-> the 5 SOL from the faucet went to the PROGRAM address, not to the payer.
+
+############ 8. what a funded program address does to a deploy (localnet) ############
+probe program address: 6kBjD1B4rehiTS47SctqEiVcxQmFKLxS39MLSKjRK7yQ
+--- fund it like the faucet did on devnet ---
+Signature: 5HZs5mXFzydiTUw7bKspbJsT3QCpqpuiiHVtK8xgTye78XNZ7eWnhZyUHjd1Lkc1xvvjajpr7Y9YGbZRiE97euu5
+
+5 SOL
+--- try to deploy to a funded system address ---
+Error: Account 6kBjD1B4rehiTS47SctqEiVcxQmFKLxS39MLSKjRK7yQ is not an upgradeable program or already in use
+DEPLOY_EXIT=0
+--- drain it back, then deploy again ---
+Signature: 3TwjpesiE2wVrpWvBLj2ZSzVvQGp5jogG6A56BByhF7HHd5FJ7oVrUvZ5NbDbKB69fRTd1URfD5faQxnJGZFdist
+
+0 SOL
+Program Id: 6kBjD1B4rehiTS47SctqEiVcxQmFKLxS39MLSKjRK7yQ
+
+Signature: 4CKpd88tmqt5X7CkHqBBuvb9VXH9U9xyorhSvXSzZ736cYtAUchSUP5dXFo5pPSVQDpZuoQc6GdvJVxYZ7P6RMz4
+
+DEPLOY_EXIT=0
+
+note: the DEPLOY_EXIT=0 lines in section 8 are the exit code of the tail
+at the end of the pipe, not of 'solana program deploy'. Read the Error /
+Program Id lines instead: the funded address is refused, the emptied one
+deploys.
