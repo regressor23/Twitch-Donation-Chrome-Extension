@@ -84,7 +84,17 @@ async function sendTip(
 ): Promise<{ signature: string; sentAt: number; confirmedAt: number }> {
   const { stdout } = await run(
     'pnpm',
-    ['exec', 'tsx', 'scripts/tip-devnet.ts', '--amount', '1', '--nick', `run${index}`, '--message', `latency run ${index}`],
+    [
+      'exec',
+      'tsx',
+      'scripts/tip-devnet.ts',
+      '--amount',
+      '1',
+      '--nick',
+      `run${index}`,
+      '--message',
+      `latency run ${index}`,
+    ],
     { cwd: process.cwd(), maxBuffer: 1024 * 1024 },
   );
   const match = /SENT_AT=(\d+) CONFIRMED_AT=(\d+) SIGNATURE=(\S+)/.exec(stdout);

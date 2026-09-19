@@ -22,7 +22,8 @@ loadLocalEnv();
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   const index = argv.indexOf('--channel');
-  const channelId = (index >= 0 ? argv[index + 1] : null) ?? process.env.TEST_CHANNEL_ID ?? '123456789';
+  const channelId =
+    (index >= 0 ? argv[index + 1] : null) ?? process.env.TEST_CHANNEL_ID ?? '123456789';
 
   if (argv.includes('--rotate')) {
     const token = randomBytes(32).toString('base64url');

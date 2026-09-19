@@ -20,3 +20,8 @@ program/types/
 # drizzle-kit rewrites these on every `db:generate`; formatting them creates a
 # diff nobody wrote.
 web/drizzle/meta/
+
+# Captured output, not source: transaction payloads, command logs and
+# screenshots. Reformatting evidence destroys the only thing it is good for —
+# being the bytes that actually came back.
+docs/evidence/
