@@ -6,9 +6,14 @@ packages:
 # Optional native accelerators pulled in by @solana/web3.js. Kept off: the JS
 # fallback is fine for our workload, and every postinstall build script we do
 # not run is one less place for a supply-chain surprise.
+#
+# esbuild is the exception and has to run: drizzle-kit and tsx execute it, and
+# its postinstall is what links the platform binary. Skipped, they fail on first
+# use with a "host platform" error that looks like a bug in our own code.
 allowBuilds:
   bigint-buffer: false
   bufferutil: false
+  esbuild: true
   utf-8-validate: false
 minimumReleaseAgeExclude:
   - prettier@3.9.8

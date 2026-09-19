@@ -1,0 +1,41 @@
+S3 — checks, 2026-09-19 22:39:38 UTC
+
+########## pnpm lint ##########
+$ eslint .
+
+########## pnpm -r typecheck ##########
+packages/shared typecheck$ tsc --noEmit
+program typecheck$ tsc --noEmit -p tsconfig.json
+ext typecheck$ tsc --noEmit
+packages/shared typecheck: Done
+web typecheck$ tsc --noEmit
+ext typecheck: Done
+program typecheck: Done
+web typecheck: Done
+
+########## pnpm test ##########
+$ vitest run
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.1 [39m[90m/home/oleksii/code/tipvault[39m
+
+ [32m✓[39m tests/smoke.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m packages/shared/src/networks.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m packages/shared/src/types.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m packages/shared/src/memo.test.ts [2m([22m[2m56 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m web/lib/tx.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m packages/shared/src/memo.fuzz.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 265[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[32m116 passed[39m[22m[90m (116)[39m
+[2m   Start at [22m 22:39:42
+[2m   Duration [22m 706ms[2m (import 42%, tests 34%, transform 22%, worker 2%)[22m
+
+
+########## deployed service smoke ##########
+GET  /overlay/<current token>      -> 200
+GET  /overlay/<wrong token>        -> 404
+POST /api/webhooks/helius  no auth -> 401
+POST /api/webhooks/helius  bad auth-> 401
+POST /api/webhooks/helius  ok      -> 200
+POST /api/internal/poll    no auth -> 401
+POST /api/internal/poll    ok      -> {"channels":1,"scanned":25,"picked":[]}

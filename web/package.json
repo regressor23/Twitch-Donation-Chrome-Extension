@@ -6,15 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit migrate",
+    "devnet:setup": "tsx scripts/setup-devnet.ts",
+    "devnet:tip": "tsx scripts/tip-devnet.ts",
+    "devnet:seed": "tsx scripts/seed-channel.ts",
+    "helius:webhook": "tsx scripts/helius-webhook.ts",
+    "measure": "tsx scripts/measure-latency.ts",
+    "overlay:token": "tsx scripts/overlay-token.ts"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@solana/spl-token": "^0.4.15",
+    "@solana/web3.js": "^1.99.0",
+    "@tipvault/shared": "workspace:*",
+    "drizzle-orm": "^0.45.2",
     "next": "16.3.5",
+    "postgres": "^3.4.9",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0"
+    "@types/react-dom": "^19.3.0",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.23.13"
   }
 }

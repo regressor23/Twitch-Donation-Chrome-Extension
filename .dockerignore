@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+.git
+.next
+web/.next
+program/target
+program/keys
+ext/dist
+docs/evidence
+**/.env
+**/.env.*
+!**/.env.example

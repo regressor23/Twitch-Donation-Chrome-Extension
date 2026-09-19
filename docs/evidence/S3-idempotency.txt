@@ -1,0 +1,27 @@
+S3 condition 3 — idempotency on a real Helius payload
+date: 2026-09-19 22:39:03 UTC
+
+docs/evidence/S3-helius-payload.json is the body Helius itself POSTed to
+/api/webhooks/helius at 2026-09-19T22:19:06Z. That delivery is what created
+the row below; everything that follows is the same bytes sent again.
+signature: oAWJNogQgKgYfWxWq7oNkVpesNMhq9qu874erQSNXQRSLaGtcLWmjRvtS8WjemomqHz9e1S6yejVq5minZegNJB
+payload:   4684 bytes
+
+--- state now ---
+rows in tips for that signature: 1
+  alerted webhook amount=3000000 nick="captured" msg="payload capture" seen_at=2026-09-19T22:19:06.805Z
+total tips: 34   helius_raw events: 3
+
+--- replay 1: curl --data-binary the captured file, real Authorization header ---
+{"accepted":1,"outcomes":["duplicate"]}    HTTP 200
+
+--- replay 2: curl --data-binary the captured file, real Authorization header ---
+{"accepted":1,"outcomes":["duplicate"]}    HTTP 200
+
+--- replay 3: curl --data-binary the captured file, real Authorization header ---
+{"accepted":1,"outcomes":["duplicate"]}    HTTP 200
+
+--- state after three more replays ---
+rows in tips for that signature: 1
+  alerted webhook amount=3000000 nick="captured" msg="payload capture" seen_at=2026-09-19T22:19:06.805Z
+total tips: 34   helius_raw events: 3

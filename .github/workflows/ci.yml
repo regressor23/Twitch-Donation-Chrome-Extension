@@ -25,3 +25,20 @@ jobs:
       - run: pnpm typecheck
 
       - run: pnpm test
+
+  # The image Railway deploys, built here on every change. Without this, a
+  # Dockerfile that only works on one machine is discovered during a deploy.
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the deploy image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

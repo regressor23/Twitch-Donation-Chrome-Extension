@@ -16,3 +16,7 @@ web/next-env.d.ts
 # make `pnpm --filter @tipvault/program check:idl` fail on every run.
 program/idl/
 program/types/
+
+# drizzle-kit rewrites these on every `db:generate`; formatting them creates a
+# diff nobody wrote.
+web/drizzle/meta/

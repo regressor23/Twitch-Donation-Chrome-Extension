@@ -1,0 +1,32 @@
+overlay stream open, catch-up discarded
+
+sent  valid tip (control)        424TPks6HCVPLHJx…
+sent  scam token, valid memo     4pta61S8hfRg1F7p…
+sent  garbage memo               2YXM31rteZvN5XbL…
+sent  foreign protocol memo      4QraFGKdrTPDcEzj…
+sent  truncated tv1 memo         5JdrY8V98prP6o1J…
+sent  memo for another channel   5Q3psFCBuPArG7Pq…
+
+waiting 45 s for webhook + scheduled sweep…
+
+========================================================================================================
+case                      expected    row in tips               alert on overlay
+========================================================================================================
+✓ valid tip (control)     alert       alerted/webhook nick="alex"YES nick="alex"
+    424TPks6HCVPLHJx12QmM6Ka1RtXQgiZsVGbaQkHJ28S6RG6KRgGRerszRWYmLDBnwXd3T1PKPstGifuQkjziTkk
+✓ scam token, valid memo  nothing     — none —                  no
+    4pta61S8hfRg1F7pbYgPoVbtSahHYVGpHv9cNBfP1cU3iUFPqUW7owiAWXfu6yV6MJF6sGZsir7jRn8JPjNSANLj
+✓ garbage memo            silent row  seen/webhook nick=null    no
+    2YXM31rteZvN5XbLD7oukEpSofLpQdg6Znky3x4AcApMmFmdRjTE6dgDbsyAM6w1muzC3DQUPruSRD66zdQA3JDd
+✓ foreign protocol memo   silent row  seen/webhook nick=null    no
+    4QraFGKdrTPDcEzjUN5QzvSTwqpEsoEvVzaQ5avWxE9MU26CDREsmg4oWPxzvr9WH9ciqZyApSg2cLch1mi6L4jm
+✓ truncated tv1 memo      silent row  seen/webhook nick=null    no
+    5JdrY8V98prP6o1JoR6mjwjchz4UxXs5YnWga6ojfC3A1FEFoqLLmhnKHCt1LjLpGkSjyYfU9m72kTKd5L7gegyd
+✓ memo for another channelsilent row  seen/webhook nick=null    no
+    5Q3psFCBuPArG7PqCSkhTqZWoLPVSxMEafpnrCHqYoJ4FNYYang5gzniBxPtiDFcBn1wP3ekhEoucQqdkymReNyM
+========================================================================================================
+
+scam-token signature in the events table: no trace at all
+alerts received during the run: 1
+
+ALL CASES AS EXPECTED

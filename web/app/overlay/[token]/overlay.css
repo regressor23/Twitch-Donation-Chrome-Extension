@@ -1,0 +1,91 @@
+/*
+ * Overlay styling. The page is a transparent layer inside OBS, so the body has
+ * no background of its own and nothing may scroll or overflow.
+ */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 6vh;
+  background: transparent;
+  overflow: hidden;
+  pointer-events: none;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}
+
+.card {
+  min-width: 320px;
+  max-width: 44vw;
+  padding: 20px 28px;
+  border-radius: 18px;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(135deg, rgb(88 32 200 / 92%), rgb(28 18 60 / 92%));
+  box-shadow:
+    0 18px 50px rgb(0 0 0 / 45%),
+    inset 0 1px 0 rgb(255 255 255 / 18%);
+  animation:
+    enter 420ms cubic-bezier(0.18, 0.89, 0.32, 1.28),
+    leave 380ms ease-in 5620ms forwards;
+}
+
+.amount {
+  font-size: 46px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 10px rgb(0 0 0 / 35%);
+}
+
+.from {
+  margin-top: 8px;
+  font-size: 19px;
+  opacity: 0.92;
+}
+
+.nick {
+  font-weight: 700;
+  color: #ffd76a;
+}
+
+.message {
+  margin-top: 12px;
+  font-size: 20px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  opacity: 0.96;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(-28px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes leave {
+  to {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.98);
+  }
+}
+
+/* OBS ignores this, a browser does not: no motion for anyone who asked for none. */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+  }
+}

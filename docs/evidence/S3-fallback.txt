@@ -1,0 +1,15 @@
+S3 condition 4 — the webhook did not arrive
+date: 2026-09-19 22:28:31 UTC
+
+deleted webhook 5ba2bcb5-9b20-4279-8fc6-7144f8369672 at Helius -> HTTP 200
+webhooks registered now: 0
+waiting 30 s so the deletion is certainly in force…
+overlay stream open, catch-up discarded
+
+tip sent with no webhook in existence: 32rGy1YVyt4SbEcYsXviWRGWRs16QZqG2YG7uq4EqNMLD6fPWkuyT1yc6MdMCj4XrZsfSfJ8ZJXXxoyfjpHGmSXn
+
+==============================================================================
+alert arrived after 12.9 s, nick="fallback"
+row in tips: alerted/poll amount=4000000 nick="fallback"
+==============================================================================
+FALLBACK PROVEN: no webhook existed, the sweep delivered the alert

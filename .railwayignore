@@ -1,0 +1,8 @@
+# Uploaded on every `railway up`; none of this belongs in a build context.
+node_modules
+.git
+program/target
+program/keys
+web/.next
+ext/dist
+docs/evidence
