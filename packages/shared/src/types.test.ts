@@ -1,6 +1,6 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { fromU64String, toU64String } from './types.js';
+import { fromU64String, toU64String } from './types';
 
 const U64_MAX = 18_446_744_073_709_551_615n;
 

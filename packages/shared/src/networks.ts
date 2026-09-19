@@ -6,7 +6,7 @@
  * the mainnet one is Circle's verified USDC.
  */
 
-import type { Cluster } from './types.js';
+import type { Cluster } from './types';
 
 export const USDC_DECIMALS = 6;
 

@@ -6,7 +6,7 @@ import {
   TIP_VAULT_PROGRAM_ID,
   USDC_DECIMALS,
   USDC_MINT,
-} from './networks.js';
+} from './networks';
 
 /** Base58 as Solana uses it: no 0, O, I or l. */
 const BASE58_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;

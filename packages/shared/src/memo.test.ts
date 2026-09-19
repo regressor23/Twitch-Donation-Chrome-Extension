@@ -7,7 +7,7 @@ import {
   isValidChannelId,
   memoByteLength,
   normalizeMemoInput,
-} from './memo.js';
+} from './memo';
 
 const utf8 = new TextEncoder();
 

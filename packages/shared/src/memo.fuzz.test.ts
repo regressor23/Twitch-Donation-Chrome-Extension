@@ -1,6 +1,6 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { MEMO_LIMITS, decodeMemo, encodeMemo, memoByteLength, normalizeMemoInput } from './memo.js';
+import { MEMO_LIMITS, decodeMemo, encodeMemo, memoByteLength, normalizeMemoInput } from './memo';
 
 const RUNS = { numRuns: 500 };
 
