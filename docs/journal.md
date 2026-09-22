@@ -572,7 +572,7 @@ from confirmation    runs 5/5  median 0.25 s  min 0.06 s  max 0.27 s
 - **status:** ready_for_review
 - **date:** 2026-09-22
 - **scope_agreed:** MIT licence; English for new artefacts (rule 12(a)); no Twitch or Colosseum branding; install the Colosseum resources skill and connect the Solana MCP; evaluate replacing `@coral-xyz/anchor`, timeboxed to one hour
-- **commit:** COMMIT_PLACEHOLDER
+- **commit:** `5525a7d`
 
 > First entry written in English. From here on every new journal entry, file
 > under `docs/`, commit message and code comment is English (CLAUDE.md §1).
