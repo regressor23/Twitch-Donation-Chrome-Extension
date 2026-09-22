@@ -632,7 +632,7 @@ from confirmation    runs 5/5  median 0.25 s  min 0.06 s  max 0.27 s
 - **status:** ready_for_review
 - **date:** 2026-09-22
 - **scope_agreed:** Twitch OAuth; streamer dashboard (connect a wallet, overlay URL, token rotation, tip history); `GET /api/channel/[login]/resolve`; the overlay token out of the URL path. Claim and escrow indexing split off into S4b.
-- **commit:** COMMIT_PLACEHOLDER
+- **commit:** cdbac0f
 
 ### Done
 
