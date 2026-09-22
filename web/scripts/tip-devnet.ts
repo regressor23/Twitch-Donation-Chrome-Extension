@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-import { AnchorProvider, BN, Program, Wallet, type Idl } from '@coral-xyz/anchor';
+import { AnchorProvider, BN, Program, Wallet, type Idl } from '@anchor-lang/core';
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import { encodeMemo } from '@tipvault/shared';

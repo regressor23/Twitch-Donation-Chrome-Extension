@@ -1,6 +1,7 @@
 {
   "name": "@tipvault/program",
   "version": "0.0.0",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "description": "Anchor program tip_vault (Rust workspace, built with anchor build)",
@@ -11,7 +12,7 @@
     "check:idl": "node scripts/sync-idl.mjs --check"
   },
   "devDependencies": {
-    "@coral-xyz/anchor": "0.32.1",
+    "@anchor-lang/core": "1.2.0",
     "@solana/spl-token": "^0.4.15",
     "@solana/web3.js": "^1.99.0",
     "vitest": "^5.0.1"

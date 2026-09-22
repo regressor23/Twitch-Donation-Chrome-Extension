@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-import * as anchor from '@coral-xyz/anchor';
-import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor';
+import * as anchor from '@anchor-lang/core';
+import { AnchorProvider, BN, Program, Wallet } from '@anchor-lang/core';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,

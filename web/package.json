@@ -1,6 +1,7 @@
 {
   "name": "@tipvault/web",
   "version": "0.0.0",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -17,7 +18,7 @@
     "overlay:token": "tsx scripts/overlay-token.ts"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.32.1",
+    "@anchor-lang/core": "1.2.0",
     "@solana/spl-token": "^0.4.15",
     "@solana/web3.js": "^1.99.0",
     "@tipvault/shared": "workspace:*",

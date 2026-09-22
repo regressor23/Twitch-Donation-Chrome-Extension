@@ -566,3 +566,63 @@ from confirmation    runs 5/5  median 0.25 s  min 0.06 s  max 0.27 s
 ### Пропозиція на наступний етап
 
 - S04 за планом: Twitch OAuth, дашборд, `/api/channel/[login]/resolve`, ротація токена оверлея з інтерфейсу. Плюс UX повтору клейма, записаний у S2c як умова S4.
+
+## S3.5 — Hackathon requirements
+
+- **status:** ready_for_review
+- **date:** 2026-09-22
+- **scope_agreed:** MIT licence; English for new artefacts (rule 12(a)); no Twitch or Colosseum branding; install the Colosseum resources skill and connect the Solana MCP; evaluate replacing `@coral-xyz/anchor`, timeboxed to one hour
+- **commit:** COMMIT_PLACEHOLDER
+
+> First entry written in English. From here on every new journal entry, file
+> under `docs/`, commit message and code comment is English (CLAUDE.md §1).
+> Existing Ukrainian entries stay as they are — the journal is append-only and
+> translating the old ones is its own stage before submission.
+
+### Done
+
+- **MIT licence.** `LICENSE` at the root plus `"license": "MIT"` in all five manifests, where the field was previously absent everywhere.
+- **Language rule in CLAUDE.md §1.** Written in Ukrainian on purpose: the file is Ukrainian, and mixing languages inside one document is worse than being consistent until the whole thing is translated. CLAUDE.md itself and the chat stay Ukrainian; neither is a submission artefact.
+- **Branding rule in CLAUDE.md §4.7,** and the palette changed to obey it. The overlay card's gradient started at `#5820c8`; Twitch's brand purple is `#9146FF`. Not the same colour, but the same family, on a product whose whole context is Twitch — exactly the argument nobody wants to be having during a store review. Everything moved to teal on slate, which belongs to neither Twitch nor Solana (Solana's own identity is a purple-to-green gradient, so avoiding purple keeps us from implying an endorsement there either). **The stylesheet edits themselves are not in this commit:** S4 had already moved `overlay.css` to a different directory and `globals.css` does not exist in `main` yet, so committing the colours here would have dragged half the S4 restructure with them. The rule lands now, the pixels land with S4 — noted so the gap is visible rather than discovered.
+- **Solana MCP connected** (`https://mcp.solana.com/mcp`, no API key). It lives in the local Claude config, not in the repository, so nothing about it reaches the submission. Tools: `list_sections`, `get_documentation`, `Solana_Documentation_Search`, `Solana_Expert__Ask_For_Help`, `program_autofixer`.
+- **The Colosseum resources skill** was installed by the reviewer from `github.com/ColosseumOrg/colosseum-resources`, **globally rather than into the project**. Installing it into the repository would have committed a vendored copy of someone else's 79-agent skill tree into a submission that is judged on code written during the hackathon.
+- **Anchor client replaced:** `@coral-xyz/anchor` 0.32.1 → `@anchor-lang/core` 1.2.0.
+
+### Changed files
+
+- `LICENSE` (new, 21 lines)
+- `package.json`, `web/package.json`, `ext/package.json`, `program/package.json`, `packages/shared/package.json` (licence field)
+- `CLAUDE.md` (§1 language rule, §4.7 branding)
+- `program/package.json`, `web/package.json` (Anchor dependency), `program/tests/helpers.ts`, `web/scripts/tip-devnet.ts` (three import sites)
+- `pnpm-lock.yaml`
+- `docs/journal.md`
+
+`CLAUDE.md` and `web/package.json` also carry S4 edits in the working tree (§5.5 gained `SESSION_SECRET` and `TWITCH_REDIRECT_URI`; `web` gained an `overlay:token` script). Only the S3.5 hunks were staged, so this commit contains nothing from S4.
+
+### Verification
+
+- `pnpm lint` exit 0, `pnpm format:check` clean, `pnpm -r typecheck` 0 errors across four packages, `pnpm test` **141 passed**.
+- **`program_autofixer` over the whole program** — `attestation.rs`, `instructions/claim.rs`, `instructions/tip_escrow.rs`, `instructions/refund_expired.rs`, all 795 lines: **zero issues, zero suggestions**, `framework_detected: anchor`. Worth stating plainly because this is the first independent check of that code: until now the only evidence the program was sound was our own mutation matrix from S2a and S2c.
+- **Anchor swap, 18/18 program tests green.** The replacement turned out to be more than cosmetic: `@anchor-lang/core` 1.2.0 is the client for Anchor 1.2.0, which is the version the program is *built* with, so this closes the client/program version skew recorded as a risk in S2c. The diff is three import lines and two manifests; `tsc` passed on the first attempt, which is the strongest signal that the exported surface is identical. Net dependency change: **−7 packages**.
+- **Real consumer outside the bundler:** `tip-devnet.ts` run with `tsx` against devnet through the new client — signature `2jtdRxK32NfWSofDZ6Yazs3wb3tNFULYVxCYFxZ8jo2o5LLVVChYJhuxA8BBaaMJuskSqAJD46JFdmbksLHqiU1M`, memo `tv1|123456789|anchorswap|client 1.2.0`, confirmed in 2063 ms.
+
+### How to check by hand
+
+1. `cat LICENSE` and `grep '"license"' package.json */package.json packages/*/package.json` — MIT in all five.
+2. `grep -rn "#5820c8\|8b5cf6\|9146ff" web/ --include="*.css"` — no hits; the palette carries no purple.
+3. In WSL: `cd ~/code/tipvault/program && solana-test-validator --reset --quiet --bpf-program J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz target/deploy/tip_vault.so &` then `ANCHOR_PROVIDER_URL=http://127.0.0.1:8899 ANCHOR_WALLET=~/.config/solana/id.json pnpm run test:localnet` — 18 passed.
+
+### Not done / deliberately deferred
+
+- Translating the existing Ukrainian journal entries, `docs/security.md` and CLAUDE.md — a separate stage before submission, as agreed.
+- The S4 working tree (Twitch OAuth, dashboard, wallet proof, i18n, overlay cookie) is deliberately **not** in this commit and stays uncommitted.
+
+### Risks and open questions
+
+- **`anchor test` no longer runs on this machine.** Anchor CLI 1.2.0 spawns `surfpool` instead of `solana-test-validator`, and `surfpool` is not installed: `Failed to spawn surfpool: No such file or directory`. This is a property of the CLI, **not** a consequence of the client swap — the same failure would have happened before it. The 18 tests were therefore run by starting `solana-test-validator` directly and pointing vitest at it, which is what S2c's `--skip-local-validator` did in effect. Two consequences: CLAUDE.md §6 still lists `anchor test` as a working command when it is not, and CI has no way to run the program tests either. Installing `surfpool` or rewriting the command is a decision for S4.
+- **Purple is now forbidden but the rule is only as good as the next person reading it.** There is no automated check that a new colour is not Twitch's. A lint rule over CSS colour literals would be cheap; not done here.
+- The Colosseum skill is global, so it is not pinned by the repository: a fresh clone on another machine does not get it. That is the intended trade, recorded so nobody is surprised.
+
+### Next stage proposal
+
+- Back to S4: Twitch OAuth, dashboard, `/api/channel/[login]/resolve`, with the overlay token moved out of the URL. Claim and escrow indexing split off into S4b as agreed.
