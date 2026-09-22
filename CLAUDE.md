@@ -126,10 +126,11 @@ RPC_URL_PRIVATE / NEXT_PUBLIC_RPC_URL
 DATABASE_URL
 HELIUS_API_KEY / HELIUS_WEBHOOK_SECRET
 INTERNAL_TASK_SECRET
+SESSION_SECRET
 USDC_MINT
 POLL_INTERVAL_MS (необовʼязкова, дефолт у коді)
 AUTHORITY_SECRET (тільки сервер)
-TWITCH_CLIENT_ID / TWITCH_CLIENT_SECRET
+TWITCH_CLIENT_ID / TWITCH_CLIENT_SECRET / TWITCH_REDIRECT_URI
 CABINA_MCP_URL / CABINA_MCP_TOKEN
 MERCURYO_WIDGET_ID
 ```
@@ -151,11 +152,14 @@ pnpm dev:web          # :3000
 pnpm dev:ext          # watch-збірка в ext/dist
 pnpm test             # vitest
 pnpm e2e              # Playwright: tip → webhook → alert
-anchor build && anchor test
+anchor build          # Anchor-програма
+pnpm test:program     # тести програми на локальному валідаторі
 pnpm db:push
 ```
 
 Перед здачею етапу: `pnpm lint && pnpm test && pnpm e2e`.
+
+`anchor test` не використовуємо: Anchor CLI 1.2.0 запускає `surfpool`, якого в нашому тулчейні немає. `pnpm test:program` робить те саме явно — піднімає `solana-test-validator` із зібраною програмою, ганяє vitest і прибирає за собою валідатор та леджер.
 
 **Хостинг — Railway.** Vercel не використовуємо: оверлей тримає SSE-зʼєднання годинами, поки стример в ефірі, а serverless упирається в ліміт тривалості функції й холодні старти. Постійний процес — правильна архітектура для цього завдання, і Postgres уже там.
 

@@ -12,23 +12,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { AlertEvent } from '@tipvault/shared';
 
+import { formatUsdc } from '../../lib/money';
+
 import './overlay.css';
 
 /** How long a single alert stays up, including both animations. */
 const VISIBLE_MS = 6_000;
 
 interface Props {
-  token: string;
   soundEnabled: boolean;
   ttsEnabled: boolean;
-}
-
-/** Minor units → display string. No floats: §4.4 applies on screen too. */
-function formatUsdc(minor: string): string {
-  const value = BigInt(minor || '0');
-  const whole = value / 1_000_000n;
-  const cents = (value % 1_000_000n) / 10_000n;
-  return `$${whole}.${cents.toString().padStart(2, '0')}`;
 }
 
 function playChime(): void {
@@ -64,7 +57,7 @@ function speak(alert: AlertEvent): void {
   console.log(`[tts stub] ${alert.nick}: ${alert.message}`);
 }
 
-export function AlertClient({ token, soundEnabled, ttsEnabled }: Props): React.ReactElement {
+export function AlertClient({ soundEnabled, ttsEnabled }: Props): React.ReactElement {
   const [current, setCurrent] = useState<AlertEvent | null>(null);
   const queue = useRef<AlertEvent[]>([]);
   const showing = useRef(false);
@@ -94,7 +87,9 @@ export function AlertClient({ token, soundEnabled, ttsEnabled }: Props): React.R
   }, [soundEnabled, ttsEnabled]);
 
   useEffect(() => {
-    const source = new EventSource(`/api/overlay/${token}/stream`);
+    // No token in the URL: the HttpOnly cookie set by /overlay/<token> is what
+    // identifies this source, and EventSource sends it on every reconnect.
+    const source = new EventSource('/api/overlay/stream');
 
     source.addEventListener('tip', (event: MessageEvent<string>) => {
       const alert = JSON.parse(event.data) as AlertEvent;
@@ -111,7 +106,7 @@ export function AlertClient({ token, soundEnabled, ttsEnabled }: Props): React.R
     return () => {
       source.close();
     };
-  }, [token, drain]);
+  }, [drain]);
 
   if (!current) {
     return <div className="stage" aria-live="polite" />;

@@ -109,13 +109,51 @@ export const tips = pgTable(
   ],
 );
 
-export const escrowTips = pgTable('escrow_tips', {
-  channelId: text('channel_id').notNull(),
-  tipIndex: bigint('tip_index', { mode: 'bigint' }).notNull(),
-  donor: text('donor').notNull(),
-  amount: amount('amount').notNull(),
-  expiresAt: tstz('expires_at').notNull(),
-  settled: boolean('settled').notNull().default(false),
+/**
+ * One escrow tip, identified exactly the way the program identifies it.
+ *
+ * `(channel_id, tip_index)` is unique because that pair *is* the tip on chain:
+ * without the constraint a webhook retry and a poller sweep that see the same
+ * `tip_escrow` transaction would each insert a row, and the claim flow would
+ * later disagree with the chain about how much is owed.
+ */
+export const escrowTips = pgTable(
+  'escrow_tips',
+  {
+    channelId: text('channel_id').notNull(),
+    tipIndex: bigint('tip_index', { mode: 'bigint' }).notNull(),
+    donor: text('donor').notNull(),
+    amount: amount('amount').notNull(),
+    expiresAt: tstz('expires_at').notNull(),
+    settled: boolean('settled').notNull().default(false),
+  },
+  (table) => [unique('escrow_tips_channel_index').on(table.channelId, table.tipIndex)],
+);
+
+/**
+ * Every attestation nonce this service has ever issued.
+ *
+ * The nonce is the primary key, so "never issued twice" is a property of the
+ * table rather than a promise in a code comment — the same reasoning that kept
+ * `init` on the on-chain nonce PDA (docs/security.md §1) and that makes a
+ * repeated webhook harmless (`tips.signature`).
+ *
+ * The constraint here is deliberately stricter than the chain's. On chain the
+ * nonce PDA is seeded `[b"nonce", channel_id, nonce]`, so the same number may
+ * legitimately exist for two different channels. We never need that, and a
+ * global key cannot fail in the direction of issuing a nonce twice.
+ */
+export const attestationNonces = pgTable('attestation_nonces', {
+  /** u64, random. See the note above for why this is the primary key. */
+  nonce: amount('nonce').primaryKey(),
+  channelId: text('channel_id')
+    .notNull()
+    .references(() => channels.channelId),
+  /** Who asked for it — an attestation is issued to a signed-in creator. */
+  creatorId: uuid('creator_id').references(() => creators.id),
+  issuedAt: tstz('issued_at').notNull().defaultNow(),
+  /** Filled once the matching `claim` is seen on chain; null means unspent. */
+  claimSignature: text('claim_signature'),
 });
 
 export const alertConfigs = pgTable('alert_configs', {

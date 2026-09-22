@@ -1,0 +1,66 @@
+S4 — HTTP behaviour, captured 2026-09-22T19:35:49Z against pnpm dev:web
+Counts below are over the rendered <main>, not the whole document: Next
+also serializes the request's own search params into the RSC payload.
+
+=== sign-in page, two languages ===
+uk: <h1>Вхід для стримерів</h1>
+en: <h1>Streamer sign-in</h1>
+an unknown ?signin= value, rendered into <main>: 0 occurrences
+  raw '</script>alert' sequence in the whole document: 0
+  it reaches the RSC payload only escaped as \u003cscript: 1
+a known reason renders its own sentence: We could not confirm this sign-in started here. Please try again.
+
+=== who can see the dashboard ===
+/dashboard with no cookie:     307 -> http://127.0.0.1:3000/
+/ with a session:              307 -> http://127.0.0.1:3000/dashboard
+/dashboard with a session:     200
+/dashboard with a forged one:  307 -> http://127.0.0.1:3000/
+
+=== the overlay token is not in the page ===
+POST /api/overlay/link, no session:  401
+GET  /api/overlay/link, session:     405  (the route is POST only)
+token length returned:               43
+dashboard document bytes:            43309
+occurrences of the token anywhere in that document: 0
+positive control, same grep on the link response:   1
+server log lines with the token, before any exchange: 0
+…and after one GET /overlay/<token>:                  1   <- the residual documented in docs/security.md §4
+
+=== the overlay keeps its own stylesheet ===
+overlay css:   href="/_next/static/chunks/web_app_overlay_overlay_0o3zybg.css"
+dashboard css: href="/_next/static/chunks/web_app_(site)_globals_0dvdmem.css"
+site background rule (--bg) in the overlay's css: 0
+
+=== GET /api/channel/[login]/resolve ===
+known login:    {"channelId":"123456789","recipient":"DVZmvHwhtjXS28Bun15R2n5wLC4KTnMqZiLXBoYocxbJ","mode":"direct","presets":["1000000","2000000","5000000"],"minTip":"1000000","mint":"7LAHvqAJrBd6Czs3ragsn6fmzkouEUxyE6DgrR4piNRz"}
+mixed case:     200
+unknown login:  {"error":"not found"} (404)
+
+=== Twitch OAuth without credentials ===
+GET /api/auth/twitch/start:    {"error":"Twitch sign-in is not configured: TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, TWITCH_REDIRECT_URI. Register an application at https://dev.twitch.tv/console/apps and set them."} (503)
+callback, user pressed Cancel: 307 -> http://localhost:3000/?signin=cancelled
+callback, forged state:        307 -> http://localhost:3000/?signin=state
+
+=== wallet proof, driven end to end against a throwaway channel ===
+channel before: 0 row(s)
+challenge: 200
+--- message the wallet would show ---
+TipVault: confirm this wallet receives your tips.
+
+Twitch channel: tipvault_flow_test (987654321)
+Wallet: BTWg1gTZkrvrA3S8P48VruhvPFT9NzJHZXrHS1PjAnbj
+Issued: 2026-09-22T19:36:04.000Z
+
+Signing costs nothing and sends no transaction.
+-------------------------------------
+verify with another key's signature: 400 {"error":"signature does not match","code":"mismatch"}
+verify over a changed message: 400 {"error":"signature does not match","code":"mismatch"}
+verify with the real signature: 200 {"recipient":"BTWg1gTZkrvrA3S8P48VruhvPFT9NzJHZXrHS1PjAnbj","verifiedAt":"2026-09-22T19:36:04.989Z"}
+channel after: 1 row(s)
+  recipient matches the signing key: true
+  mode=direct minTip=1000000 presets=["1000000","2000000","5000000"]
+overlay rows: 1, token length 43
+link endpoint returns this channel's token: true
+rotate: 200, token changed: true
+old link after rotation: 404
+cleaned up, channel rows left: 0

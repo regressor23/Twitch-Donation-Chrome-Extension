@@ -158,3 +158,43 @@ URL) — окреме рішення, не зроблене на S3.
 має віддавати 404 і на `/overlay/<token>`, і на
 `/api/overlay/<token>/stream` — обидва, бо сторінка й потік перевіряють токен
 незалежно.
+
+### S4: the token leaves the URL, and the page
+
+*Written in English per CLAUDE.md §1; the Ukrainian sections above are
+translated in one pass before submission.*
+
+`web/app/overlay/[token]/route.ts`, `web/app/api/overlay/link/route.ts`
+
+S3 left this open: "прибрати токен зі шляху … — окреме рішення". S4 took it, in
+two steps, because the token was reaching two different places.
+
+**Out of the stream URL.** `/overlay/<token>` is now visited once. It checks the
+token, trades it for an HttpOnly cookie and redirects to `/overlay`; from then
+on the browser source asks for `/overlay` and `/api/overlay/stream`, neither of
+which carries anything worth logging. The cookie holds the token itself rather
+than a signed channel id — deliberately, because every request still resolves it
+against the database, so rotating from the dashboard cuts an open overlay off
+immediately. A sealed channel id would keep working until it expired, which
+would make the rotate button a lie.
+
+**Out of the dashboard HTML.** The token was briefly a prop on the overlay card,
+hidden behind a Reveal button. That hid it from a glance and from nothing else:
+the page source of a tab streamers keep open on a captured monitor. It now comes
+from `POST /api/overlay/link` when the streamer asks to copy or reveal it, so it
+reaches the browser only on purpose, and in a body rather than a path.
+
+**What is still true.** The one-time exchange is still one line in an access log
+that contains the whole token — verified here, not assumed: after driving the
+flow locally, `grep -c` over the dev server's log found the token exactly once,
+from `GET /overlay/<token>`, and zero times in the dashboard HTML. That is a
+real residual and the honest bound on it is: once per OBS setup instead of once
+per reconnect, on a value that one click replaces.
+
+Driving it to zero is possible and not done. The token would move into the URL
+fragment (`/overlay#<token>`), which browsers never send to a server, and the
+overlay page would read `location.hash` and post it to the exchange. That costs
+a JS round trip before the stream opens and makes the link harder to explain in
+support; it is a decision, not an oversight, and it is written down here so the
+next person weighs the same trade rather than rediscovering it.
+

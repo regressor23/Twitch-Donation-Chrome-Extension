@@ -626,3 +626,75 @@ from confirmation    runs 5/5  median 0.25 s  min 0.06 s  max 0.27 s
 ### Next stage proposal
 
 - Back to S4: Twitch OAuth, dashboard, `/api/channel/[login]/resolve`, with the overlay token moved out of the URL. Claim and escrow indexing split off into S4b as agreed.
+
+## S04 — Twitch sign-in, streamer dashboard, resolve
+
+- **status:** ready_for_review
+- **date:** 2026-09-22
+- **scope_agreed:** Twitch OAuth; streamer dashboard (connect a wallet, overlay URL, token rotation, tip history); `GET /api/channel/[login]/resolve`; the overlay token out of the URL path. Claim and escrow indexing split off into S4b.
+- **commit:** COMMIT_PLACEHOLDER
+
+### Done
+
+- **Twitch sign-in that asks for nothing.** The authorize URL carries an empty `scope`: Helix's Get Users returns the authenticated user on an unscoped token, and the only fact this product needs is the numeric channel id that every memo carries (§5.1). Asking for `user:read:email` would hand us a field we would then have to be careful not to store. The `state` is both signed and mirrored in a cookie, so a callback belonging to a login somebody else started is refused — without that pairing, an attacker can finish their own Twitch login in a victim's browser and leave them signed in as the attacker, pointing the dashboard at the wrong wallet.
+- **The session is a signed cookie and nothing else.** No sessions table, so signing out is a cookie deletion and an expired session cannot outlive its `exp` by sitting in a row nobody cleans up. `lib/session.ts` mixes a `purpose` into the MAC and puts `exp` inside the signed payload, so a session cookie cannot be replayed as an OAuth state or a wallet challenge, and every failure path returns `null` identically.
+- **The dashboard, and the one screen that decides where money goes.** Connecting a wallet is a signature, never a text field: the streamer types nothing, and an address cannot be pasted in by anyone who is merely signed in. The address travels once inside a sealed challenge and `verify` reads it back out of that seal rather than out of the request body, so what was signed and what gets saved cannot drift apart. A first successful verification is also what creates the channel — until a payout wallet is proven there is nothing to resolve, nothing to tip and no overlay to hand out.
+- **A wallet connector in one file.** `lib/wallet-standard.ts` does the Wallet Standard handshake in both directions (`app-ready` for wallets already present, `register-wallet` for ones that load later) plus a legacy `window.solana` fallback, in 176 lines. The alternative on the table was `@solana/wallet-adapter-react` and a UI kit — a provider tree, a modal and a pile of transitive dependencies to spend a single button.
+- **The overlay token left the URL, and then left the page.** `/overlay/<token>` is now visited once and trades the token for an HttpOnly cookie; the browser source then asks for `/overlay` and `/api/overlay/stream`, which carry nothing worth logging. The token was then briefly a prop on the dashboard's overlay card, hidden behind a Reveal button — which hid it from a glance and from nothing else, on a page streamers keep open on a monitor that is often captured. It now comes from `POST /api/overlay/link` only when asked for. Both steps are written up in `docs/security.md` §4, including the residual that is left.
+- **`pnpm test:program` replaces the `anchor test` line that stopped working.** S3.5 left the choice open between installing `surfpool` and rewriting the command; this is the rewrite. `program/scripts/test-localnet.sh` reads the program's address out of `Anchor.toml`, refuses with a sentence if the `.so` or a key is missing, starts a validator, waits until it actually answers rather than sleeping, runs vitest, and takes the validator and its ledger down on every exit path. It exists because the one-line incantation it replaces was mistyped three times during the S3.5 handover alone.
+
+### Changed files
+
+- `web/app/(site)/page.tsx` (new, 56), `web/app/(site)/layout.tsx` (new, 14), `web/app/(site)/globals.css` (moved, 190)
+- `web/app/(site)/dashboard/page.tsx` (new, 134), `wallet-card.tsx` (new, 174), `overlay-card.tsx` (new, 154), `local-time.tsx` (new, 32)
+- `web/app/api/auth/twitch/start/route.ts` (new, 45), `callback/route.ts` (new, 85), `web/app/api/auth/logout/route.ts` (new, 22)
+- `web/app/api/wallet/challenge/route.ts` (new, 54), `verify/route.ts` (new, 130)
+- `web/app/api/overlay/link/route.ts` (new, 48), `rotate/route.ts` (new, 48), `stream/route.ts` (new, 29)
+- `web/app/api/channel/[login]/resolve/route.ts` (new, 67)
+- `web/app/overlay/[token]/route.ts` (new, 50); `page.tsx`, `alert-client.tsx` and `overlay.css` moved up to `web/app/overlay/`
+- `web/lib/auth.ts` (new, 194), `session.ts` (new, 80), `twitch.ts` (new, 97), `wallet-proof.ts` (new, 114), `wallet-standard.ts` (new, 176), `i18n.ts` (new, 186), `sse.ts` (new, 83), `money.ts` (new, 40), `api-error.ts` (new, 28), `explorer.ts` (new, 22)
+- Tests: `session.test.ts` (101), `wallet-proof.test.ts` (129), `i18n.test.ts` (61), `money.test.ts` (34)
+- `program/scripts/test-localnet.sh` (new, 153), `package.json` (`test:program`)
+- `web/lib/db/schema.ts`, `web/drizzle/0001_flippant_nightshade.sql` — new table `attestation_nonces`, unique `(channel_id, tip_index)` on `escrow_tips`
+- `web/lib/env.ts`, `.env.example`, `CLAUDE.md` §5.5, `tests/smoke.test.ts` (`SESSION_SECRET`, `TWITCH_REDIRECT_URI`); `CLAUDE.md` §6 (`anchor test` → `pnpm test:program`)
+- `docs/security.md` (§4 addendum), `docs/evidence/S4-checks.txt`, `S4-http.txt`, `S4-dashboard.png`
+
+### Verification
+
+Full output in `docs/evidence/S4-checks.txt` and `docs/evidence/S4-http.txt`.
+
+- `pnpm lint` exit 0, `pnpm format:check` clean, `pnpm -r typecheck` 0 errors across four packages, `pnpm test` **146 passed**, `next build` compiled with 17 routes.
+- `pnpm test:program` — **18 passed in 30.6 s**, validator started and stopped by the script itself. First time the program tests have run from a single command since Anchor 1.2.0.
+- **The wallet proof driven end to end against a throwaway channel** (`S4-http.txt`): a signature from another key → 400 `mismatch`; a valid signature over a changed message → 400 `mismatch`; the real signature → 200, and the channel row it creates has `recipient` equal to the signing key, `mode=direct`, `minTip=1000000`. Then the overlay token is issued, `/api/overlay/link` returns that same token, rotation changes it, and the old link answers **404 immediately**. The test channel is deleted afterwards; the devnet channel was never touched.
+- **The token is not in the dashboard document:** `grep -c` over all 43 309 bytes finds it **0** times, with the same grep finding it once in the link response as a positive control. In the server log it appears **0** times until a `GET /overlay/<token>` exchange and **1** time after — the residual, stated as measured rather than assumed.
+- **The overlay loads only its own stylesheet.** Moving the site pages into a `(site)` route group keeps `globals.css` off the overlay: checked by fetching the overlay's CSS chunk and grepping for the `--bg:` rule — 0 hits. Without that split an opaque `body` background would have painted over the game capture, and both files define `.card`.
+- **An unknown `?signin=` value never renders.** `?signin=<script>alert(1)</script>` puts 0 occurrences into `<main>`, produces no raw `</script>` sequence anywhere in the document, and reaches the RSC payload only as `<script`. The reason is a closed lookup table, not escaping.
+- **`GET /api/channel/tipvault_test/resolve`** returns the §5.3 shape; mixed case resolves; an unknown login is a 404 with `{"error":"not found"}`.
+- Screenshot: `docs/evidence/S4-dashboard.png` — teal on slate, no purple anywhere (§4.7), overlay link hidden.
+
+### How to check by hand
+
+1. Register an application at <https://dev.twitch.tv/console/apps>. OAuth Redirect URL `http://localhost:3000/api/auth/twitch/callback` for local work, and the Railway URL for the deployed one. Put `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` and `TWITCH_REDIRECT_URI` in `web/.env.local`, and the same three plus `SESSION_SECRET` in Railway. Without them `/api/auth/twitch/start` answers 503 naming exactly what is missing — that is the intended behaviour, not a bug.
+2. `pnpm dev:web`, open <http://localhost:3000>. Sign in with Twitch. You land on `/dashboard`.
+3. Press **Підключити гаманець**. Approve the connection, read the message the wallet shows — it names the channel, the wallet and the time, and says signing sends no transaction — and approve it. The card should show the address and a green **Підтверджено**.
+4. Press **Копіювати** on the overlay card and paste the link into OBS as a Browser Source. It should redirect once to `/overlay` and stay there. Press **Показати** to confirm the link is only revealed when you ask for it.
+5. Press **Замінити посилання**, confirm, then reload the OBS source: it must now 404. Copy the new link and re-add it.
+6. `pnpm test:program` — 18 passed, with no validator or ledger left behind afterwards.
+
+### Not done / deliberately deferred
+
+- **S4b, as agreed:** `POST /api/claim`, escrow indexing, and the client-side nonce-PDA pre-check so a streamer sees "вже отримано" rather than a raw `already in use`.
+- The `attestation_nonces` table is created by this migration but nothing writes to it yet — it belongs to S4b, and it is here because the schema change is already approved and one migration is better than two.
+- **The live OAuth round trip is the one thing not verified here.** It needs credentials only you can create at dev.twitch.tv. Everything on either side of it is verified: the start route's failure mode, the callback's state checks, and the session the callback would issue — the dashboard was exercised with a session sealed by the same code path.
+- Connecting a wallet was verified against the server, not against a browser extension: the challenge, both rejection paths and the write were driven with a real keypair from Node. The wallet's own dialog is step 3 above.
+
+### Risks and open questions
+
+- **One access-log line still contains the token.** The exchange at `/overlay/<token>` is a GET, so Railway's edge logs it. That is once per OBS setup rather than once per reconnect, on a value one click replaces — but it is not zero. The fix, if we want zero, is to move the token into the URL fragment, which browsers never send to a server; `docs/security.md` §4 records the trade and why it was not taken here.
+- **The dashboard trusts `router.refresh()` to show the truth after a write.** That stays correct on several instances, because every render reads the database — but the in-process alert bus behind the overlay still does not, which is the same single-instance assumption S3 recorded.
+- No automated check that a new colour is not Twitch's (carried from S3.5, still true).
+- The tip history shows the last 20 rows with no paging. Fine now; a streamer with a busy month will want a date filter, which is not worth building before there is one.
+
+### Next stage proposal
+
+- **S4b**: `POST /api/claim`, escrow indexing from the webhook and the poller, and the nonce-PDA pre-check. Roughly a day.

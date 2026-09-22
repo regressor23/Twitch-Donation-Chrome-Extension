@@ -1,0 +1,51 @@
+S4 — Twitch OAuth, dashboard, resolve
+captured 2026-09-22T19:33:10Z on Linux 6.18.33.2-microsoft-standard-WSL2
+node v24.16.0, pnpm 12.4.2
+
+=== pnpm lint ===
+$ eslint .
+
+=== pnpm format:check ===
+$ prettier --check .
+Checking formatting...
+All matched files use Prettier code style!
+
+=== pnpm -r typecheck ===
+packages/shared typecheck: Done
+ext typecheck: Done
+program typecheck: Done
+web typecheck: Done
+
+=== pnpm test ===
+ Test Files  10 passed (10)
+      Tests  146 passed (146)
+   Duration  828ms (import 41%, transform 33%, tests 24%, worker 2%)
+
+=== pnpm test:program ===
+[test-localnet] starting a validator with tip_vault at J6uAbWr24AsXfhmW8cTannQ7ZE2cqqWiCLs9s9PqWMxz
+[test-localnet] validator ready
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Duration  30.64s (tests 99%, import 1%)
+[test-localnet] stopping the validator
+
+=== pnpm --filter @tipvault/web build ===
+✓ Compiled successfully in 2.7s
+  Finished TypeScript in 2.1s ...
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/twitch/callback
+├ ƒ /api/auth/twitch/start
+├ ƒ /api/channel/[login]/resolve
+├ ƒ /api/internal/poll
+├ ƒ /api/overlay/[token]/stream
+├ ƒ /api/overlay/link
+├ ƒ /api/overlay/rotate
+├ ƒ /api/overlay/stream
+├ ƒ /api/wallet/challenge
+├ ƒ /api/wallet/verify
+├ ƒ /api/webhooks/helius
+├ ƒ /dashboard
+├ ƒ /overlay
+└ ƒ /overlay/[token]
