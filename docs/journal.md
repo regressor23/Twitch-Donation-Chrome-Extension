@@ -704,7 +704,7 @@ Full output in `docs/evidence/S4-checks.txt` and `docs/evidence/S4-http.txt`.
 - **status:** ready_for_review
 - **date:** 2026-09-27
 - **scope_agreed:** deploy S4 to Railway and verify it there (reviewer: "Роби")
-- **commit:** COMMIT_PLACEHOLDER
+- **commit:** f92a0cf
 
 ### Done
 
