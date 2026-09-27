@@ -17,6 +17,7 @@ import {
   sealSession,
   upsertCreator,
 } from '../../../../../lib/auth';
+import { redirectTo } from '../../../../../lib/http';
 import { unseal } from '../../../../../lib/session';
 import { signedInUser } from '../../../../../lib/twitch';
 import { STATE_COOKIE } from '../start/route';
@@ -31,10 +32,8 @@ function sameString(a: string, b: string): boolean {
 }
 
 /** Sign-in failures land back on the home page with a reason, never a stack. */
-function failed(request: Request, reason: string): NextResponse {
-  const url = new URL('/', request.url);
-  url.searchParams.set('signin', reason);
-  const response = NextResponse.redirect(url);
+function failed(reason: string): NextResponse {
+  const response = redirectTo(`/?signin=${encodeURIComponent(reason)}`);
   response.cookies.delete(STATE_COOKIE);
   return response;
 }
@@ -47,10 +46,10 @@ export async function GET(request: Request): Promise<NextResponse> {
   // Twitch sends the user back here with `error=access_denied` when they press
   // Cancel. That is not a failure worth a scary message.
   if (url.searchParams.get('error')) {
-    return failed(request, 'cancelled');
+    return failed('cancelled');
   }
   if (!code || !state) {
-    return failed(request, 'incomplete');
+    return failed('incomplete');
   }
 
   const cookie = request.headers
@@ -61,7 +60,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     ?.slice(STATE_COOKIE.length + 1);
 
   if (!cookie || !sameString(cookie, state) || !unseal('oauth-state', state)) {
-    return failed(request, 'state');
+    return failed('state');
   }
 
   let creatorId: string;
@@ -71,10 +70,10 @@ export async function GET(request: Request): Promise<NextResponse> {
     creatorId = await upsertCreator(user);
   } catch (error) {
     console.error('[auth] twitch sign-in failed', error);
-    return failed(request, 'twitch');
+    return failed('twitch');
   }
 
-  const response = NextResponse.redirect(new URL('/dashboard', request.url));
+  const response = redirectTo('/dashboard');
   response.cookies.set(
     SESSION_COOKIE,
     sealSession({ twitchUserId: user.id, login: user.login, creatorId }),

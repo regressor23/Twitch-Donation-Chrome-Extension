@@ -698,3 +698,50 @@ Full output in `docs/evidence/S4-checks.txt` and `docs/evidence/S4-http.txt`.
 ### Next stage proposal
 
 - **S4b**: `POST /api/claim`, escrow indexing from the webhook and the poller, and the nonce-PDA pre-check. Roughly a day.
+
+## S04.1 — Redirects behind the proxy
+
+- **status:** ready_for_review
+- **date:** 2026-09-27
+- **scope_agreed:** deploy S4 to Railway and verify it there (reviewer: "Роби")
+- **commit:** COMMIT_PLACEHOLDER
+
+### Done
+
+- **S4 deployed to Railway and probed, which is how the bug below was found.** The service had been running code from 19.09 — `/dashboard`, the OAuth routes and `resolve` were all 404 on the live domain while passing locally. The deploy went up as an archive of the working tree (`railway up`), because connecting the GitHub repository is a GitHub App authorization in the reviewer's account and neither the MCP nor the CLI exposes it.
+- **Every same-site redirect is now relative.** `NextResponse.redirect(new URL('/dashboard', request.url))` reads correctly and is wrong behind a proxy: on Railway `request.url` carries the internal origin, so the response was `Location: https://localhost:3000/dashboard`. Four call sites were affected — the sign-in success redirect, the sign-in failure redirect, sign-out, and the overlay token exchange. In production that meant **a successful Twitch sign-in would have sent the streamer to a dead address**, and an OBS browser source pasting the overlay link would have been sent to one too.
+- **The repair is a relative `Location`,** which RFC 7231 §7.1.2 allows and browsers resolve against the address they actually asked for. The other candidate — rebuilding the origin from `x-forwarded-host` — was rejected on purpose: it lets a client-supplied header decide where we send people, which is an open redirect with extra steps.
+- **A guard that has teeth.** `web/lib/http.test.ts` scans every `route.ts` under `web/app` and fails on `NextResponse.redirect(new URL(..., request.url))`. Verified by putting the bug back into `logout/route.ts` for one run: the suite failed and named that file, and went green when it was removed.
+
+### Changed files
+
+- `web/lib/http.ts` (new, 21) — `redirectTo`
+- `web/lib/http.test.ts` (new, 62)
+- `web/app/api/auth/twitch/callback/route.ts`, `web/app/api/auth/logout/route.ts`, `web/app/overlay/[token]/route.ts`
+
+### Verification
+
+- `pnpm lint` exit 0, `pnpm format:check` clean, `pnpm -r typecheck` 0 errors, `pnpm test` **163 passed** (was 146).
+- Locally, all three redirects now emit a relative location: `/?signin=cancelled`, `/?signin=state`, `/`.
+- On the deployed service, before the fix: `GET /api/auth/twitch/callback?code=abc&state=forged` → `307 -> https://localhost:3000/?signin=state`. That single line is what exposed it; everything else about that deploy was green.
+- Also verified on the deployed service: `/api/auth/twitch/start` → 307 to `id.twitch.tv/oauth2/authorize` with `scope=` empty and the right `redirect_uri`; `/dashboard` without a session → 307 to `/`; `resolve` → the §5.3 shape for a known login, 404 for an unknown one; the sign-in page in both languages.
+
+### How to check by hand
+
+1. Open <https://web-production-0daf2.up.railway.app/> and sign in with Twitch. You must land on `/dashboard` on the Railway domain — that is the whole point of this entry.
+2. Press **Вийти**; you must land back on the Railway domain, not on localhost.
+3. Copy the overlay link and open it once; it must redirect to `/overlay` on the same domain.
+
+### Not done / deliberately deferred
+
+- **Auto-deploy from GitHub is still not connected.** Every deploy remains a manual archive upload, so `main` and the running service can drift apart — exactly the drift that hid this bug for five days. Connecting `Settings → Source → Connect Repo` is one click in the reviewer's account.
+- The service config still reads `Builder: RAILPACK`, but the build log shows `[6/6] RUN pnpm --filter @tipvault/web build`, so Railway is detecting and using the root `Dockerfile` as §6 requires. Pinning it explicitly is a one-field change nobody needs yet.
+
+### Risks and open questions
+
+- **Locally correct, remotely wrong is a class, not an incident.** Anything derived from `request.url` — an absolute link in an email, a canonical URL, a Solana Action href — has the same failure mode, and the test added here only covers redirects in route handlers. Worth remembering when Blinks land in S5, where the action URL is part of the payload.
+- The deployed instance is still the single process the S3 poller assumes; nothing here changes that.
+
+### Next stage proposal
+
+- Unchanged: **S4b** — `POST /api/claim`, escrow indexing, the nonce-PDA pre-check.

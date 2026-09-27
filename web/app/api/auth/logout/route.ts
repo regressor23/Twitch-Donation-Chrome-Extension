@@ -11,12 +11,13 @@
 import { NextResponse } from 'next/server';
 
 import { cookieOptions, SESSION_COOKIE } from '../../../../lib/auth';
+import { redirectTo } from '../../../../lib/http';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request): Promise<NextResponse> {
-  const response = NextResponse.redirect(new URL('/', request.url), { status: 303 });
+export async function POST(): Promise<NextResponse> {
+  const response = redirectTo('/', 303);
   response.cookies.set(SESSION_COOKIE, '', { ...cookieOptions, maxAge: 0 });
   return response;
 }

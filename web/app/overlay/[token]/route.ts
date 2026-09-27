@@ -18,6 +18,7 @@
 import { NextResponse } from 'next/server';
 
 import { cookieOptions } from '../../../lib/auth';
+import { redirectTo } from '../../../lib/http';
 import { overlayTarget } from '../../../lib/overlay';
 
 export const runtime = 'nodejs';
@@ -29,7 +30,7 @@ export const OVERLAY_COOKIE = 'tv_overlay';
 const OVERLAY_TTL_SECONDS = 60 * 60 * 24 * 180;
 
 export async function GET(
-  request: Request,
+  _request: Request,
   context: { params: Promise<{ token: string }> },
 ): Promise<NextResponse> {
   const { token } = await context.params;
@@ -41,7 +42,7 @@ export async function GET(
     return new NextResponse('not found', { status: 404 });
   }
 
-  const response = NextResponse.redirect(new URL('/overlay', request.url));
+  const response = redirectTo('/overlay');
   response.cookies.set(OVERLAY_COOKIE, token, {
     ...cookieOptions,
     maxAge: OVERLAY_TTL_SECONDS,
