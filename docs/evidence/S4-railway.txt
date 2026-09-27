@@ -1,0 +1,37 @@
+S4 / S4.1 on Railway — captured 2026-09-27T09:53:13Z
+https://web-production-0daf2.up.railway.app, deployment 0b9b1251 (562e917)
+
+=== sign-in entry point ===
+HTTP/1.1 307 Temporary Redirect
+location: https://id.twitch.tv/oauth2/authorize?client_id=<redacted>&redirect_uri=https%3A%2F%2Fweb-production-0daf2.up.railway.app%2Fapi%2Fauth%2Ftwitch%2Fcallback&response_type=code&scope=&state=<redacted>
+
+=== same-site redirects are relative (the S4.1 fix) ===
+callback, user cancelled: location: /?signin=cancelled
+callback, forged state:   location: /?signin=state
+sign-out:                 location: /
+
+=== access control ===
+/dashboard, no cookie:     307 -> https://web-production-0daf2.up.railway.app/
+/dashboard, forged cookie: 307 -> https://web-production-0daf2.up.railway.app/
+POST /api/overlay/link:    401
+POST /api/overlay/rotate:  401
+POST /api/wallet/verify:   401
+a wrong overlay token:     404
+
+=== resolve ===
+known login:   {"channelId":"123456789","recipient":"DVZmvHwhtjXS28Bun15R2n5wLC4KTnMqZiLXBoYocxbJ","mode":"direct","presets":["1000000","2000000","5000000"],"minTip":"1000000","mint":"7LAHvqAJrBd6Czs3ragsn6fmzkouEUxyE6DgrR4piNRz"}
+unknown login: {"error":"not found"} (404)
+
+=== sign-in page, two languages ===
+uk: <h1>Вхід для стримерів</h1>
+en: <h1>Streamer sign-in</h1>
+
+=== S3 paths still alive (a 500 here would mean env() is failing) ===
+POST /api/webhooks/helius, no auth header: 401
+POST /api/internal/poll, no secret:        401
+
+=== container startup (railway logs) ===
+  next start, Ready in 84ms
+  [poll] POLL_INTERVAL_MS is not set, using the built-in default 30000 ms
+  [poll] scheduled sweep every 30000 ms
+  no env() error, so all six required variables resolved
